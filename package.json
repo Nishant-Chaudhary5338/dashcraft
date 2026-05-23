@@ -2,6 +2,23 @@
   "name": "dashcraft-monorepo",
   "private": true,
   "version": "0.0.0",
+  "description": "Monorepo for @dashcraft/core — headless React dashboard library with boolean API, drag-drop, resizable widgets, and MCP server",
+  "keywords": [
+    "react", "dashboard", "headless", "drag-and-drop", "dnd-kit",
+    "recharts", "nivo", "mcp", "dashboard-mcp", "mcp-react-dashboard",
+    "react-dashboard-library", "react-drag-and-drop", "react-resizable",
+    "monorepo", "turbo", "typescript"
+  ],
+  "author": "Nishant Chaudhary <nishantchaudhary.dev@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://dashcraft.digitribe.world",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Nishant-Chaudhary5338/dashcraft.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Nishant-Chaudhary5338/dashcraft/issues"
+  },
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",

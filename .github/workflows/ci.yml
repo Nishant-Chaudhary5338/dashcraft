@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  core:
+    name: "@dashcraft/core — Build & Test (Node ${{ matrix.node }})"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [20, 22]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Use Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build @dashcraft/core
+        run: pnpm --filter @dashcraft/core build
+
+      - name: Type check @dashcraft/core
+        run: pnpm --filter @dashcraft/core typecheck
+
+      - name: Test @dashcraft/core
+        run: pnpm --filter @dashcraft/core test
+
+  mcp:
+    name: "@dashcraft/mcp-codegen — Build"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build MCP server
+        run: pnpm --filter @dashcraft/mcp-codegen build
+
+  site:
+    name: "Site — Build"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/site/package-lock.json
+
+      - name: Install site dependencies
+        working-directory: apps/site
+        run: npm ci
+
+      - name: Build @dashcraft/core (required by site)
+        working-directory: packages/core
+        run: npm install && npm run build
+
+      - name: Build site
+        working-directory: apps/site
+        run: npm run build

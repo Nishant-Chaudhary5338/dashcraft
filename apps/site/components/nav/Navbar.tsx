@@ -25,6 +25,7 @@ export function Navbar() {
 
         <div className="nav-links">
           <Link href="/docs" className="nav-link">Docs</Link>
+          <Link href="/showcase" className="nav-link">Showcase</Link>
           <Link href="/playground" className="nav-link">Playground</Link>
           <a
             href="https://github.com/nishant-chaudhary/dashcraft"

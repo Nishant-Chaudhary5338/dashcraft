@@ -1,64 +1,75 @@
 # dashcraft
 
-Headless React dashboard library. Craft dashboards, not headaches.
+[![CI](https://github.com/Nishant-Chaudhary5338/dashcraft/actions/workflows/ci.yml/badge.svg)](https://github.com/Nishant-Chaudhary5338/dashcraft/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/@dashcraft/core)](https://www.npmjs.com/package/@dashcraft/core)
+[![License: MIT](https://img.shields.io/badge/License-MIT-6366f1.svg)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-dashcraft provides the logic, state, and composable building blocks for interactive dashboards. You own the styling. Bring recharts, nivo, or both.
+**Headless React dashboard library. Five boolean props. Your styles.**
 
-## Features
+dashcraft gives you drag-and-drop grids, resizable widgets, KPI cards, recharts + nivo charts, persistent layouts, and an MCP codegen server — without touching your design system.
 
-- **Drag-and-drop layout** — powered by `@dnd-kit`, full keyboard support
-- **Resizable widgets** — resize any widget at runtime, sizes persisted in store
-- **Edit mode** — toggle between view and edit mode with a single hook
-- **KPI widgets** — format values as currency, percentage, or plain number with trend indicators
-- **Chart widgets** — recharts bar/line/area/scatter and nivo heatmap/treemap/sunburst, both optional peer deps
-- **HTTP client** — typed fetch wrapper with loading/error state wired to the dashboard store
-- **Zustand store** — centralised dashboard state, subscribable from anywhere
-- **Headless** — zero opinion on colours or spacing; bring Tailwind, CSS modules, or anything else
-- **TypeScript first** — strict types throughout, full declaration files included
+→ **[Live site & playground](https://dashcraft.digitribe.world)** · [Docs](https://dashcraft.digitribe.world/docs) · [npm](https://www.npmjs.com/package/@dashcraft/core)
+
+---
+
+## Why dashcraft?
+
+| Pain | dashcraft |
+|---|---|
+| Every dashboard library forces its design system | Fully headless — bring Tailwind, CSS Modules, or nothing |
+| Wiring recharts to drag-drop takes days | `drag resize settings delete` — four props, done |
+| AI tools don't know your component API | `llms.txt` + MCP codegen server built in |
+| Saving layouts is a custom build every time | `persist="key"` — one prop, localStorage automatic |
+
+---
 
 ## Install
 
 ```sh
-npm install dashcraft
-# peer deps
-npm install react react-dom
-# optional chart peers
+npm install @dashcraft/core
+
+# Optional chart peer deps
 npm install recharts
 npm install @nivo/core @nivo/heatmap @nivo/treemap @nivo/sunburst
 ```
 
+---
+
 ## Quick start
 
 ```tsx
-import { Dashboard, DashboardCard } from 'dashcraft'
-import { KPIWidget, RechartsWidget } from 'dashcraft/widgets'
-import 'dashcraft/styles.css'
+import { Dashboard, DashboardCard, KPIWidget, RechartsWidget } from '@dashcraft/core'
+import '@dashcraft/core/styles.css'
+
+const data = [
+  { month: 'Jan', revenue: 12400 },
+  { month: 'Feb', revenue: 15600 },
+  { month: 'Mar', revenue: 18200 },
+]
 
 export function SalesDashboard() {
   return (
-    <Dashboard id="sales">
-      <DashboardCard id="revenue" colSpan={1}>
-        <KPIWidget
-          id="revenue-kpi"
-          title="Revenue"
-          value={124500}
-          format="currency"
-          previousValue={98000}
-        />
+    <Dashboard id="sales" persist="sales-v1">
+      <DashboardCard
+        id="revenue"
+        drag resize settings
+        style={{ gridColumn: '1 / span 4', gridRow: '1 / span 2' }}
+      >
+        <KPIWidget title="Revenue" value={46200} format="currency" previousValue={38000} />
       </DashboardCard>
 
-      <DashboardCard id="chart" colSpan={2}>
+      <DashboardCard
+        id="chart"
+        drag resize settings delete
+        style={{ gridColumn: '5 / span 8', gridRow: '1 / span 4' }}
+      >
         <RechartsWidget
-          id="monthly-sales"
+          title="Monthly Revenue"
           chartType="bar"
-          title="Monthly Sales"
-          data={[
-            { name: 'Jan', value: 4000 },
-            { name: 'Feb', value: 3000 },
-            { name: 'Mar', value: 5000 },
-          ]}
-          series={[{ key: 'value', name: 'Sales', color: '#6366f1' }]}
-          xAxisKey="name"
+          data={data}
+          series={[{ key: 'revenue', name: 'Revenue', color: '#6366f1' }]}
+          xAxisKey="month"
         />
       </DashboardCard>
     </Dashboard>
@@ -66,54 +77,126 @@ export function SalesDashboard() {
 }
 ```
 
-## Edit mode
+---
 
-```tsx
-import { useDashboard } from 'dashcraft'
+## The boolean API
 
-function EditToggle() {
-  const { isEditMode, toggleEditMode } = useDashboard()
-  return <button onClick={toggleEditMode}>{isEditMode ? 'Done' : 'Edit'}</button>
-}
-```
+Every interactive behaviour is a single boolean prop on `DashboardCard`:
 
-## HTTP client
-
-```tsx
-import { useHttpClient } from 'dashcraft/http'
-
-function LiveWidget() {
-  const { data, loading, error, refetch } = useHttpClient<SalesData>('/api/sales')
-  if (loading) return <Spinner />
-  return <KPIWidget id="live-revenue" value={data?.total ?? 0} format="currency" />
-}
-```
-
-## Package exports
-
-| Import | What you get |
+| Prop | What it does |
 |---|---|
-| `dashcraft` | `Dashboard`, `DashboardCard`, `useDashboard`, `useDashboardStore` |
-| `dashcraft/widgets` | All widgets — recharts, nivo, KPI |
-| `dashcraft/widgets/recharts` | `RechartsWidget` only |
-| `dashcraft/widgets/nivo` | Nivo widgets only |
-| `dashcraft/widgets/kpi` | `KPIWidget` only |
-| `dashcraft/hooks` | All hooks |
-| `dashcraft/store` | Zustand store and actions |
-| `dashcraft/http` | `useHttpClient`, typed fetch |
-| `dashcraft/utils` | `cn`, formatting helpers |
-| `dashcraft/styles.css` | Base styles (import once at app root) |
+| `drag` | Enables drag-and-drop via @dnd-kit |
+| `resize` | Shows resize handles |
+| `settings` | Shows settings gear icon |
+| `delete` | Shows delete button |
+| `responsive` | Enables responsive breakpoints |
+
+No config objects. No verbose prop names. Just booleans.
+
+---
+
+## Components
+
+| Component | Purpose |
+|---|---|
+| `<Dashboard>` | Root grid container, manages state + persistence |
+| `<DashboardCard>` | Widget wrapper with all behaviour props |
+| `<KPIWidget>` | Metric card with trend indicators |
+| `<RechartsWidget>` | recharts (bar, line, area, pie, scatter, radar) |
+| `<NivoWidget>` | @nivo (heatmap, treemap, sunburst) |
+
+---
+
+## Hooks
+
+| Hook | Purpose |
+|---|---|
+| `useDashboard(id)` | Access state, toggle edit mode |
+| `useWidgetData(id)` | Push live data into widgets |
+| `useWidgetEvents(id)` | Subscribe to settings/delete/resize/drag events |
+| `usePersistence(key)` | Manual save/restore with custom storage |
+| `useDraggable(id)` | Raw @dnd-kit drag state |
+| `useResize(id)` | Raw resize state |
+
+---
+
+## AI-native
+
+dashcraft is built to work with AI tools out of the box:
+
+- **`llms.txt`** at [`/llms.txt`](https://dashcraft.digitribe.world/llms.txt) — machine-readable API reference any LLM can fetch
+- **`AGENTS.md`** at [`/AGENTS.md`](https://dashcraft.digitribe.world/AGENTS.md) — full agent guide for code generation
+- **MCP server** — `@dashcraft/mcp-codegen` for Claude Desktop, Cursor, and any MCP client
+
+### MCP setup
+
+```sh
+npm install -g @dashcraft/mcp-codegen
+```
+
+Add to `claude_desktop_config.json`:
+```json
+{
+  "mcpServers": {
+    "dashcraft": {
+      "command": "dashcraft-mcp"
+    }
+  }
+}
+```
+
+Tools: `analyze_dashboard` · `generate_code` · `generate_project`
+
+---
+
+## Monorepo structure
+
+```
+packages/
+  core/           @dashcraft/core — the React library
+apps/
+  site/           Product site (Next.js 15)
+tools/
+  codegen/        @dashcraft/mcp-codegen — MCP server
+```
+
+---
 
 ## Development
 
 ```sh
-npm install
-npm run dev          # watch mode
-npm run build        # compile to dist/
-npm run test         # vitest
-npm run typecheck    # tsc --noEmit
+# Install dependencies
+pnpm install
+
+# Start all apps
+pnpm dev
+
+# Start just the site
+pnpm --filter @dashcraft/site dev
+
+# Build the library
+pnpm --filter @dashcraft/core build
+
+# Run library tests
+pnpm --filter @dashcraft/core test
 ```
+
+Requires Node.js 20+, pnpm 9+.
+
+---
+
+## Contributing
+
+Contributions are very welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
+
+Short version:
+1. Fork → branch → code
+2. `pnpm --filter @dashcraft/core build` must pass
+3. `pnpm --filter @dashcraft/core test` must pass
+4. Open a PR with the checklist filled out
+
+---
 
 ## License
 
-MIT
+MIT © [Nishant Chaudhary](https://github.com/Nishant-Chaudhary5338)
