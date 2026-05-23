@@ -31,6 +31,39 @@
   --dot-size:       28px;
 }
 
+/* ─── Light mode tokens ──────────────────────────────────────────── */
+[data-theme="light"] {
+  --bg-base:        #f5f6fc;
+  --bg-surface:     #ffffff;
+  --bg-elevated:    #eceef8;
+  --bg-hover:       #e4e6f4;
+  --border:         #d4d7eb;
+  --border-subtle:  #e4e6f4;
+  --border-hover:   #b0b4d0;
+  --accent:         #6366f1;
+  --accent-hover:   #4f46e5;
+  --accent-subtle:  rgba(99,102,241,0.08);
+  --accent-glow:    rgba(99,102,241,0.14);
+  --text-primary:   #0f1117;
+  --text-secondary: #3d4460;
+  --text-muted:     #7c85a8;
+  --code-bg:        #eceef8;
+  --success:        #16a34a;
+  --success-subtle: rgba(22,163,74,0.08);
+  --dot-color:      #d0d3e8;
+}
+
+[data-theme="light"] .nav.scrolled {
+  background: rgba(245,246,252,0.92);
+}
+
+[data-theme="light"] .code-window {
+  box-shadow: 0 4px 24px rgba(99,102,241,0.08);
+}
+
+/* ─── Theme transition ───────────────────────────────────────────── */
+*, *::before, *::after { transition: background-color 0.18s ease, border-color 0.18s ease, color 0.1s ease; }
+
 /* ─── Reset ──────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
@@ -121,6 +154,19 @@ h1,h2,h3,h4,h5,h6 {
 }
 .nav-logo:hover .nav-logo-dot:nth-child(odd) { opacity: 0.35; }
 .nav-links { display: flex; align-items: center; gap: 4px; }
+
+/* ─── Theme toggle ───────────────────────────────────────────────── */
+.theme-toggle {
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text-secondary); cursor: pointer;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+.theme-toggle:hover {
+  color: var(--text-primary); background: var(--bg-elevated);
+  border-color: var(--border-hover);
+}
 .nav-link {
   font-size: 0.875rem; color: var(--text-secondary); text-decoration: none;
   padding: 6px 12px; border-radius: var(--radius-sm);

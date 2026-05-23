@@ -87,7 +87,7 @@ describe("WidgetActionButton", () => {
         icon={<span>Icon</span>}
       />
     );
-    expect(screen.getByRole("button")).toHaveClass("top-2", "left-2");
+    expect(screen.getByRole("button")).toHaveClass("top-1", "left-1");
   });
 });
 

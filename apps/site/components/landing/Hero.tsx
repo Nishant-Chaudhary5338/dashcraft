@@ -87,7 +87,7 @@ export function Hero() {
           <div className="fade-up fade-up-1">
             <span className="badge badge-accent" style={{ marginBottom: 28 }}>
               <span className="badge-dot" />
-              Open Source · Headless · MIT
+              Open Source · Headless · MCP-native · MIT
             </span>
           </div>
 
@@ -98,7 +98,7 @@ export function Hero() {
           </h1>
 
           <p className="fade-up fade-up-3" style={{ fontSize: "1.1rem", color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: 36, maxWidth: 460 }}>
-            Stop wiring react-grid-layout from scratch. dashcraft gives you draggable, resizable, chart-ready dashboard widgets with a boolean API that reads like plain English — and zero opinions about your styles.
+            Stop wiring react-grid-layout from scratch. dashcraft gives you draggable, resizable, chart-ready dashboard widgets with a boolean API that reads like plain English — zero opinions about your styles, and a built-in MCP server so your AI assistant can generate full dashboards from a description.
           </p>
 
           <div className="fade-up fade-up-4" style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 28 }}>
