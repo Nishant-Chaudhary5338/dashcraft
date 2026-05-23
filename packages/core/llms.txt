@@ -1,0 +1,52 @@
+# @dashcraft/core
+
+Headless React dashboard library. Build interactive dashboards with drag-and-drop layout, resizable widgets, KPI cards, and charts.
+
+## Install
+npm install @dashcraft/core
+
+## Core API
+
+### Dashboard (root component)
+Props: id, persist (storage key), storage ("localStorage"|"sessionStorage"), defaultEdit, onLayoutChange, children
+
+### DashboardCard (widget wrapper)
+Props: id, drag (boolean), resize (boolean), settings (boolean|ReactNode), delete (boolean), responsive (boolean), title, children, onDelete, onSettingsChange, onDragEnd
+
+### KPIWidget
+Props: id, title, value (number), format ("number"|"currency"|"percent"), previousValue, trend, prefix, suffix
+
+### RechartsWidget
+Props: id, chartType ("bar"|"line"|"area"|"pie"|"scatter"|"radar"|"radialBar"), data, series, xAxisKey, title, height
+
+### NivoWidget
+Props: id, chartType ("heatmap"|"treemap"|"sunburst"), data, title, colorScheme, height
+
+### useDashboard (hook)
+Returns: { isEditMode, toggleEditMode, setEditMode, widgets, addWidget, removeWidget, updateWidgetPosition, updateWidgetSize, updateWidgetSettings, saveLayout, loadLayout, resetLayout }
+
+### useDashboardStore (Zustand store)
+Direct Zustand store access for custom integrations.
+
+## Quick start example
+```tsx
+import { Dashboard, DashboardCard } from '@dashcraft/core'
+import { KPIWidget, RechartsWidget } from '@dashcraft/core'
+import '@dashcraft/core/styles.css'
+
+function SalesDashboard() {
+  return (
+    <Dashboard id="sales" persist="sales-v1">
+      <DashboardCard id="revenue" drag resize>
+        <KPIWidget id="rev-kpi" title="Revenue" value={124500} format="currency" previousValue={98000} />
+      </DashboardCard>
+      <DashboardCard id="chart" drag resize settings>
+        <RechartsWidget id="sales-chart" chartType="bar" title="Monthly Sales"
+          data={[{name:'Jan',value:4000},{name:'Feb',value:3000}]}
+          series={[{key:'value',name:'Sales',color:'#6366f1'}]}
+          xAxisKey="name" />
+      </DashboardCard>
+    </Dashboard>
+  )
+}
+```

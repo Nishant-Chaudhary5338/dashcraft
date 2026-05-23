@@ -1,0 +1,6 @@
+{
+  "name": "dashcraft-codegen",
+  "version": "0.1.0",
+  "description": "Convert dashboard images to @dashcraft/core React code",
+  "tools": ["analyze_dashboard", "generate_code", "generate_project"]
+}

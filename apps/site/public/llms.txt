@@ -1,0 +1,133 @@
+# dashcraft
+
+> Headless React dashboard library with boolean API, drag-and-drop, resizable widgets, and AI-native tooling.
+
+## Overview
+
+dashcraft (`@dashcraft/core`) is an MIT-licensed React library for building admin panels, analytics dashboards, and internal tools. It handles layout, drag-and-drop, resizing, persistence, and widget state — you bring your own styles.
+
+## Quick Install
+
+```bash
+npm install @dashcraft/core
+# Optional chart peer deps
+npm install recharts
+npm install @nivo/core @nivo/bar @nivo/line @nivo/pie
+```
+
+## Core Concepts
+
+The API is intentionally minimal. Every interactive behaviour is a boolean prop on `DashboardCard`:
+
+```tsx
+import { Dashboard, DashboardCard, KPIWidget, RechartsWidget } from '@dashcraft/core'
+import '@dashcraft/core/styles.css'
+
+export function MyDashboard() {
+  return (
+    <Dashboard id="main" persist="main-v1">
+      <DashboardCard id="revenue" drag resize settings delete>
+        <KPIWidget title="Revenue" value={124500} format="currency" />
+      </DashboardCard>
+      <DashboardCard id="sales-chart" drag resize settings>
+        <RechartsWidget
+          chartType="bar"
+          data={salesData}
+          series={[{ key: 'value', name: 'Sales', color: '#6366f1' }]}
+          xAxisKey="month"
+        />
+      </DashboardCard>
+    </Dashboard>
+  )
+}
+```
+
+## Components
+
+### `<Dashboard>`
+Root layout container.
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `id` | `string` | Unique dashboard identifier |
+| `persist` | `string` | localStorage key for layout persistence |
+| `columns` | `number` | Grid columns (default: 12) |
+| `rowHeight` | `number` | Row height in px (default: 60) |
+| `editMode` | `boolean` | Enable/disable edit mode |
+| `onLayoutChange` | `(layout) => void` | Layout change callback |
+
+### `<DashboardCard>`
+Widget wrapper with behaviour props.
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `id` | `string` | Unique card identifier |
+| `drag` | `boolean` | Enable drag-and-drop |
+| `resize` | `boolean` | Enable resize handles |
+| `settings` | `boolean` | Show settings button |
+| `delete` | `boolean` | Show delete button |
+| `responsive` | `boolean` | Responsive breakpoint support |
+| `style` | `CSSProperties` | Grid positioning via `gridColumn` / `gridRow` |
+
+### `<KPIWidget>`
+Metric card with trend indicators.
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `title` | `string` | Widget title |
+| `value` | `number` | Current metric value |
+| `format` | `"currency" \| "percent" \| "number"` | Value formatting |
+| `previousValue` | `number` | Previous period value (shows trend) |
+| `prefix` | `string` | Value prefix |
+| `suffix` | `string` | Value suffix |
+
+### `<RechartsWidget>`
+Chart widget backed by recharts.
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `chartType` | `"bar" \| "line" \| "area" \| "pie" \| "scatter" \| "radar"` | Chart type |
+| `data` | `object[]` | Chart data array |
+| `series` | `SeriesConfig[]` | Data series with key, name, color |
+| `xAxisKey` | `string` | Key for X-axis values |
+| `title` | `string` | Widget title |
+
+### `<NivoWidget>`
+Chart widget backed by @nivo.
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `chartType` | `"heatmap" \| "treemap" \| "sunburst"` | Chart type |
+| `data` | `object[]` | Nivo-compatible data |
+| `title` | `string` | Widget title |
+| `colorScheme` | `string` | Nivo color scheme |
+
+## Hooks
+
+- `useDashboard(id)` — Access dashboard state and edit mode
+- `useWidgetData(id)` — Subscribe to widget data updates
+- `useWidgetEvents(id)` — Subscribe to widget interaction events
+- `usePersistence(key)` — Manual layout persistence control
+- `useDraggable(id)` — Raw drag state for custom widgets
+- `useResize(id)` — Raw resize state for custom widgets
+
+## MCP Server
+
+For AI-assisted dashboard generation, use `@dashcraft/mcp-codegen`:
+
+```bash
+npm install -g @dashcraft/mcp-codegen
+```
+
+Tools available:
+- `analyze_dashboard` — Analyze a screenshot and map widgets to @dashcraft/core components
+- `generate_code` — Generate TSX code from widget configuration
+- `generate_project` — Generate a complete Vite project as a base64 zip
+
+## Links
+
+- Docs: https://dashcraft.digitribe.world/docs
+- Playground: https://dashcraft.digitribe.world/playground
+- GitHub: https://github.com/nishant-chaudhary/dashcraft
+- npm: https://npmjs.com/package/@dashcraft/core
+- AGENTS.md: https://dashcraft.digitribe.world/AGENTS.md

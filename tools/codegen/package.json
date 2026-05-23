@@ -1,0 +1,24 @@
+{
+  "name": "@dashcraft/mcp-codegen",
+  "version": "0.1.0",
+  "description": "MCP server — convert dashboard images to @dashcraft/core React code",
+  "type": "module",
+  "license": "MIT",
+  "bin": { "dashcraft-codegen": "./build/index.js" },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node build/index.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.36.0",
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "archiver": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/archiver": "^6.0.0",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "~5.7.0"
+  }
+}

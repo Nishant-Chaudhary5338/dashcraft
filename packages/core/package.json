@@ -1,0 +1,168 @@
+{
+  "name": "@dashcraft/core",
+  "version": "0.1.0",
+  "description": "Headless React dashboard library — drag-and-drop, resizable widgets, KPI cards, chart-agnostic",
+  "type": "module",
+  "license": "MIT",
+  "author": "Nishant Chaudhary",
+  "homepage": "https://dashcraft.digitribe.world",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nishant-chaudhary/dashcraft"
+  },
+  "keywords": [
+    "react",
+    "dashboard",
+    "headless",
+    "widgets",
+    "drag-drop",
+    "recharts",
+    "nivo",
+    "typescript"
+  ],
+  "sideEffects": [
+    "dist/index.css"
+  ],
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./styles.css": "./dist/index.css",
+    "./widgets": {
+      "types": "./dist/widgets/index.d.ts",
+      "import": "./dist/widgets/index.js",
+      "require": "./dist/widgets/index.cjs"
+    },
+    "./widgets/recharts": {
+      "types": "./dist/widgets/recharts/index.d.ts",
+      "import": "./dist/widgets/recharts/index.js",
+      "require": "./dist/widgets/recharts/index.cjs"
+    },
+    "./widgets/nivo": {
+      "types": "./dist/widgets/nivo/index.d.ts",
+      "import": "./dist/widgets/nivo/index.js",
+      "require": "./dist/widgets/nivo/index.cjs"
+    },
+    "./widgets/kpi": {
+      "types": "./dist/widgets/kpi/index.d.ts",
+      "import": "./dist/widgets/kpi/index.js",
+      "require": "./dist/widgets/kpi/index.cjs"
+    },
+    "./hooks": {
+      "types": "./dist/hooks/index.d.ts",
+      "import": "./dist/hooks/index.js",
+      "require": "./dist/hooks/index.cjs"
+    },
+    "./store": {
+      "types": "./dist/store/index.d.ts",
+      "import": "./dist/store/index.js",
+      "require": "./dist/store/index.cjs"
+    },
+    "./http": {
+      "types": "./dist/utils/http-client.d.ts",
+      "import": "./dist/utils/http-client.js",
+      "require": "./dist/utils/http-client.cjs"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.js",
+      "require": "./dist/utils/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "llms.txt",
+    "AGENTS.md"
+  ],
+  "scripts": {
+    "build": "tsup && npm run build:styles",
+    "build:styles": "tailwindcss -i ./src/styles.css -o ./dist/index.css",
+    "dev": "tsup --watch",
+    "dev:styles": "tailwindcss -i ./src/styles.css -o ./dist/index.css --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint \"**/*.ts\" \"**/*.tsx\"",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.1.0",
+    "@dnd-kit/sortable": "^8.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@radix-ui/react-dialog": "^1.1.0",
+    "@radix-ui/react-dropdown-menu": "^2.1.0",
+    "@radix-ui/react-popover": "^1.1.0",
+    "@radix-ui/react-slider": "^1.2.0",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-switch": "^1.1.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.0.0",
+    "lucide-react": "^1.7.0",
+    "re-resizable": "^6.10.0",
+    "tailwind-merge": "^3.5.0",
+    "zustand": "^5.0.0"
+  },
+  "peerDependencies": {
+    "@nivo/core": ">=0.87.0",
+    "@nivo/heatmap": ">=0.87.0",
+    "@nivo/sunburst": ">=0.87.0",
+    "@nivo/treemap": ">=0.87.0",
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "recharts": ">=2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "recharts": {
+      "optional": true
+    },
+    "@nivo/core": {
+      "optional": true
+    },
+    "@nivo/heatmap": {
+      "optional": true
+    },
+    "@nivo/treemap": {
+      "optional": true
+    },
+    "@nivo/sunburst": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@nivo/core": "^0.87.0",
+    "@nivo/heatmap": "^0.87.0",
+    "@nivo/sunburst": "^0.87.0",
+    "@nivo/treemap": "^0.87.0",
+    "@tailwindcss/cli": "^4.1.5",
+    "@tailwindcss/postcss": "^4.1.5",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/react": "^18.3.19",
+    "@types/react-dom": "^18.3.5",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.39.4",
+    "jsdom": "^29.0.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "recharts": "^2.15.4",
+    "tailwindcss": "^4.1.5",
+    "tsup": "^8.4.0",
+    "typescript": "~5.7.3",
+    "vite": "^5.4.0",
+    "vitest": "^2.1.0"
+  },
+  "overrides": {
+    "@types/react": "^18.3.19",
+    "@types/react-dom": "^18.3.5"
+  }
+}
