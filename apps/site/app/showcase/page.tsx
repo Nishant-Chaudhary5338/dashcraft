@@ -14,10 +14,10 @@ export default function ShowcasePage() {
     <>
       <Navbar />
       <div style={{ paddingTop: 60 }}>
-        {/* Page header */}
+        {/* Tight page header — product speaks for itself below */}
         <div
           style={{
-            padding: "56px 32px 40px",
+            padding: "32px 32px 24px",
             textAlign: "center",
             borderBottom: "1px solid var(--border)",
             background: "var(--bg-surface)",
@@ -26,27 +26,27 @@ export default function ShowcasePage() {
           <div
             style={{
               display: "inline-block",
-              padding: "4px 14px",
+              padding: "3px 12px",
               borderRadius: 999,
               background: "var(--accent-subtle)",
               color: "var(--accent)",
-              fontSize: "0.75rem",
+              fontSize: "0.72rem",
               fontWeight: 700,
               letterSpacing: "0.08em",
               textTransform: "uppercase",
-              marginBottom: 20,
+              marginBottom: 14,
             }}
           >
-            Live Demo · Powered by @dashcraft/core
+            Live Demo · @dashcraft/core
           </div>
           <h1
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(2rem, 4vw, 3rem)",
+              fontSize: "clamp(1.6rem, 3vw, 2.2rem)",
               fontWeight: 700,
               letterSpacing: "-0.025em",
               color: "var(--text-primary)",
-              margin: "0 0 16px",
+              margin: 0,
             }}
           >
             Real dashboards. Real code.
@@ -54,53 +54,14 @@ export default function ShowcasePage() {
           <p
             style={{
               color: "var(--text-secondary)",
-              fontSize: "1.05rem",
-              maxWidth: 560,
-              margin: "0 auto 24px",
-              lineHeight: 1.7,
+              fontSize: "0.9rem",
+              margin: "10px auto 0",
+              lineHeight: 1.6,
+              maxWidth: 440,
             }}
           >
-            Three production-grade dashboard layouts built entirely with{" "}
-            <code
-              style={{
-                fontFamily: "var(--font-mono)",
-                background: "var(--accent-subtle)",
-                color: "var(--accent)",
-                padding: "1px 6px",
-                borderRadius: 4,
-              }}
-            >
-              @dashcraft/core
-            </code>
-            . Drag widgets, resize them, delete and restore. Hit Download to get a
-            full working Vite project.
+            Drag, resize, delete widgets — then grab the full Vite project in one click.
           </p>
-          <div
-            style={{
-              display: "flex",
-              gap: "12px",
-              justifyContent: "center",
-              flexWrap: "wrap",
-              fontSize: "0.8rem",
-              color: "var(--text-muted)",
-            }}
-          >
-            {["drag", "resize", "settings", "delete"].map((prop) => (
-              <span
-                key={prop}
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  background: "var(--bg-elevated)",
-                  border: "1px solid var(--border)",
-                  padding: "4px 10px",
-                  borderRadius: 6,
-                  color: "var(--accent)",
-                }}
-              >
-                {prop}
-              </span>
-            ))}
-          </div>
         </div>
 
         {/* Interactive showcase */}

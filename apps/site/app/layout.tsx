@@ -5,12 +5,17 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 export const metadata: Metadata = {
   title: "dashcraft — Headless React Dashboard Library",
   description:
-    "Build React dashboards via MCP, drag-and-drop, resizable widgets, KPI cards, and chart support in one MIT library. Boolean API. Bring your own styles. AI-native.",
+    "Build React dashboards via MCP — describe a dashboard or drop a screenshot and get production-ready code. Drag-and-drop, resizable widgets, KPI cards, recharts support. Boolean API. Headless. MIT.",
   keywords: [
     "react dashboard library",
     "headless dashboard react",
     "build dashboard via mcp",
     "mcp react dashboard codegen",
+    "mcp dashboard generator",
+    "image to dashboard mcp",
+    "ai dashboard builder mcp",
+    "mcp server react dashboard",
+    "screenshot to dashboard",
     "react drag and drop dashboard",
     "react resizable widgets",
     "dashboard mcp server",
@@ -25,16 +30,16 @@ export const metadata: Metadata = {
   openGraph: {
     title: "dashcraft — Build React Dashboards with One Prop (or via MCP)",
     description:
-      "The headless React dashboard library with drag-and-drop, resizable widgets, recharts + nivo charts, persistent layouts, and a built-in MCP codegen server. Free and open source.",
+      "Headless React dashboard library with a built-in MCP server: describe a dashboard or drop a screenshot, get production-ready @dashcraft/core code. Drag-and-drop, resizable widgets, recharts charts. Free, open source, MIT.",
     url: "https://dashcraft.digitribe.world",
     siteName: "dashcraft",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "dashcraft — Headless React Dashboard Library",
+    title: "dashcraft — Headless React Dashboard Library with MCP",
     description:
-      "Boolean API. Headless. Chart-agnostic. AI-native with MCP codegen. Build React dashboards without the plumbing.",
+      "Boolean API. Headless. Chart-agnostic. AI-native: built-in MCP server converts screenshots and descriptions into dashboard code. Build React dashboards without the plumbing.",
   },
   metadataBase: new URL("https://dashcraft.digitribe.world"),
 };
@@ -45,7 +50,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link

@@ -42,14 +42,12 @@ export default function InstallationPage() {
         <p className="docs-p">
           dashcraft is chart-agnostic. Install only the chart libraries you need:
         </p>
-        <Code code={`# For recharts (bar, line, area, pie, scatter, radar)
-npm install recharts
-
-# For @nivo (heatmap, treemap, sunburst)
-npm install @nivo/core @nivo/heatmap @nivo/treemap @nivo/sunburst`} />
+        <Code code={`# For recharts (bar, line, area, pie, scatter, radar, treemap, sunburst)
+npm install recharts`} />
         <div className="docs-callout">
-          <strong>Note:</strong> If you don&apos;t install a chart library, the corresponding widget
-          components will not render. KPIWidget has no chart dependency.
+          <strong>Note:</strong> recharts is the only optional chart peer dep — it powers RechartsWidget
+          plus the HierarchyWidget treemap &amp; sunburst. KPIWidget and the HierarchyWidget heatmap are
+          built in and have no chart dependency.
         </div>
       </Step>
 

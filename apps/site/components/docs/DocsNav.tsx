@@ -18,7 +18,7 @@ const NAV = [
       { href: "/docs/components#dashboardcard", label: "DashboardCard" },
       { href: "/docs/components#kpiwidget", label: "KPIWidget" },
       { href: "/docs/components#rechartswidget", label: "RechartsWidget" },
-      { href: "/docs/components#nivowidget", label: "NivoWidget" },
+      { href: "/docs/components#hierarchywidget", label: "HierarchyWidget" },
     ],
   },
   {

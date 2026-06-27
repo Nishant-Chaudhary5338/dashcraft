@@ -310,7 +310,6 @@ const Dashboard = React.memo(function Dashboard({
 
   const handleDragStart = useCallback(
     (event: DragStartEvent) => {
-      console.log("[DEBUG] Dashboard: DRAG START triggered for widget:", event.active.id);
       // Bring widget to front when drag starts
       bringToFront(event.active.id as string);
     },

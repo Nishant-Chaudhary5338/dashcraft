@@ -1,6 +1,6 @@
 import React from "react";
 import { DashboardCard } from "../../components/DashboardCard";
-import type { NivoWidgetProps, NivoChartType } from "./nivo.types";
+import type { HierarchyWidgetProps, HierarchyChartType } from "./hierarchy.types";
 import { HeatMapWidget } from "./charts/HeatMapWidget";
 import { TreemapWidget } from "./charts/TreemapWidget";
 import { SunburstWidget } from "./charts/SunburstWidget";
@@ -9,20 +9,19 @@ import { SunburstWidget } from "./charts/SunburstWidget";
 // Chart Component Map
 // ============================================================
 
-const chartComponents: Record<NivoChartType, React.ComponentType<import("./nivo.types").NivoChartComponentProps>> = {
+const chartComponents: Record<HierarchyChartType, React.ComponentType<import("./hierarchy.types").HierarchyChartComponentProps>> = {
   heatmap: HeatMapWidget,
   treemap: TreemapWidget,
   sunburst: SunburstWidget,
 };
 
 // ============================================================
-// NivoWidget Component
+// HierarchyWidget Component — treemap, sunburst, heatmap
 // ============================================================
 
-export const NivoWidget = React.memo(function NivoWidget({
+export const HierarchyWidget = React.memo(function HierarchyWidget({
   chartType,
   data,
-  colorScheme = "nivo",
   colors,
   animate = true,
   showLabels = true,
@@ -30,21 +29,13 @@ export const NivoWidget = React.memo(function NivoWidget({
   chartHeight = 300,
   margin,
   ...cardProps
-}: NivoWidgetProps): React.JSX.Element {
-  // ==========================================================
-  // Computed Values
-  // ==========================================================
-
+}: HierarchyWidgetProps): React.JSX.Element {
   const ChartComponent = chartComponents[chartType];
-
-  // ==========================================================
-  // Render
-  // ==========================================================
 
   return (
     <DashboardCard
       {...cardProps}
-      type={`nivo-${chartType}`}
+      type={`hierarchy-${chartType}`}
     >
       <div
         className="w-full min-h-[250px]"
@@ -55,7 +46,6 @@ export const NivoWidget = React.memo(function NivoWidget({
         ) : (
           <ChartComponent
             data={data}
-            colorScheme={colorScheme}
             colors={colors}
             animate={animate}
             showLabels={showLabels}
@@ -68,4 +58,4 @@ export const NivoWidget = React.memo(function NivoWidget({
   );
 });
 
-NivoWidget.displayName = "NivoWidget";
+HierarchyWidget.displayName = "HierarchyWidget";

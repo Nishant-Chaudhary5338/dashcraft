@@ -1,6 +1,6 @@
 const ITEMS = [
   "React", "TypeScript", "Vite", "Next.js", "Tailwind CSS",
-  "recharts", "nivo", "@dnd-kit", "Zustand", "Framer Motion",
+  "recharts", "@dnd-kit", "Zustand", "Framer Motion",
   "shadcn/ui", "Radix UI", "TanStack Query",
 ];
 

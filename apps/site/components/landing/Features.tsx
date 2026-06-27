@@ -12,7 +12,7 @@ const FEATURES = [
   {
     symbol: "⬡",
     title: "Chart-Agnostic",
-    desc: "recharts and nivo are optional peer deps. Use one, both, or neither. Drop any chart renderer inside a DashboardCard and it just works.",
+    desc: "recharts is an optional peer dep powering bar/line/area charts plus a built-in treemap & sunburst. Use it or not — drop any chart renderer inside a DashboardCard and it just works.",
   },
   {
     symbol: "✦",

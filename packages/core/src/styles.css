@@ -1,4 +1,4 @@
 @import "tailwindcss";
-@import "@repo/tailwind-config";
+@source "../src/**/*.{ts,tsx}";
 
 /* DashCraft Widget Styles */

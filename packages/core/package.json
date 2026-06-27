@@ -17,7 +17,6 @@
     "widgets",
     "drag-drop",
     "recharts",
-    "nivo",
     "typescript"
   ],
   "sideEffects": [
@@ -43,10 +42,10 @@
       "import": "./dist/widgets/recharts/index.js",
       "require": "./dist/widgets/recharts/index.cjs"
     },
-    "./widgets/nivo": {
-      "types": "./dist/widgets/nivo/index.d.ts",
-      "import": "./dist/widgets/nivo/index.js",
-      "require": "./dist/widgets/nivo/index.cjs"
+    "./widgets/hierarchy": {
+      "types": "./dist/widgets/hierarchy/index.d.ts",
+      "import": "./dist/widgets/hierarchy/index.js",
+      "require": "./dist/widgets/hierarchy/index.cjs"
     },
     "./widgets/kpi": {
       "types": "./dist/widgets/kpi/index.d.ts",
@@ -110,43 +109,23 @@
     "zustand": "^5.0.0"
   },
   "peerDependencies": {
-    "@nivo/core": ">=0.87.0",
-    "@nivo/heatmap": ">=0.87.0",
-    "@nivo/sunburst": ">=0.87.0",
-    "@nivo/treemap": ">=0.87.0",
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0",
-    "recharts": ">=2.0.0"
+    "recharts": ">=3.0.0"
   },
   "peerDependenciesMeta": {
     "recharts": {
       "optional": true
-    },
-    "@nivo/core": {
-      "optional": true
-    },
-    "@nivo/heatmap": {
-      "optional": true
-    },
-    "@nivo/treemap": {
-      "optional": true
-    },
-    "@nivo/sunburst": {
-      "optional": true
     }
   },
   "devDependencies": {
-    "@nivo/core": "^0.87.0",
-    "@nivo/heatmap": "^0.87.0",
-    "@nivo/sunburst": "^0.87.0",
-    "@nivo/treemap": "^0.87.0",
     "@tailwindcss/cli": "^4.1.5",
     "@tailwindcss/postcss": "^4.1.5",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
-    "@types/react": "^18.3.19",
-    "@types/react-dom": "^18.3.5",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "@vitejs/plugin-react": "^4.3.4",
@@ -155,7 +134,7 @@
     "jsdom": "^29.0.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "recharts": "^2.15.4",
+    "recharts": "^3.8.1",
     "tailwindcss": "^4.1.5",
     "tsup": "^8.4.0",
     "typescript": "~5.7.3",

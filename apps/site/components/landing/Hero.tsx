@@ -200,18 +200,18 @@ export function Hero() {
                 <span className="tok-string">"Revenue"</span>
                 {" "}
                 <span className="tok-prop">value</span>
-                <span className="tok-punct">={"{"}{"{"}</span>
+                <span className="tok-punct">{"={"}</span>
                 <span className="tok-number">124500</span>
-                <span className="tok-punct">{"}"}{"}"}{"}"}</span>
+                <span className="tok-punct">{"}"}</span>
                 {"\n          "}
                 <span className="tok-prop">format</span>
                 <span className="tok-punct">=</span>
                 <span className="tok-string">"currency"</span>
                 {" "}
                 <span className="tok-prop">previousValue</span>
-                <span className="tok-punct">={"{"}{"{"}</span>
+                <span className="tok-punct">{"={"}</span>
                 <span className="tok-number">98000</span>
-                <span className="tok-punct">{"}"}{"}"}{"}"}</span>
+                <span className="tok-punct">{"}"}</span>
                 {"\n        "}
                 <span className="tok-punct">/&gt;</span>
                 {"\n      "}

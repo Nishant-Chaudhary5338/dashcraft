@@ -1,15 +1,64 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
+import {
+  LineChart, AreaChart, BarChart, PieChart, ScatterChart,
+  Line, Area, Bar, Pie, Cell, Scatter, ZAxis,
+  ResponsiveContainer, Tooltip,
+} from "recharts";
 import type { WidgetConfig } from "@/lib/codegen";
 import { generateDashboardCode } from "@/lib/codegen";
 import { CopyButton } from "@/components/ui/CopyButton";
 
-const WIDGET_TYPES: Array<{
+// Playground internal type — uses CSS grid layout for the canvas visualisation.
+// Converted to WidgetConfig (pixel positions) before calling codegen.
+interface PlaygroundWidget {
+  id: string;
   type: WidgetConfig["type"];
+  title: string;
+  colStart: number;
+  colSpan: number;
+  rowStart: number;
+  rowSpan: number;
+  drag: boolean;
+  resize: boolean;
+  settings: boolean;
+  delete: boolean;
+  config: WidgetConfig["config"];
+}
+
+const CANVAS_WIDTH = 672;
+const CANVAS_COLS = 12;
+const CANVAS_GAP = 10;
+const COL_WIDTH = (CANVAS_WIDTH - (CANVAS_COLS - 1) * CANVAS_GAP) / CANVAS_COLS;
+const ROW_HEIGHT = 100;
+
+function playgroundToCodegen(widgets: PlaygroundWidget[]): WidgetConfig[] {
+  return widgets.map((w) => ({
+    id: w.id,
+    type: w.type,
+    title: w.title,
+    defaultPosition: {
+      x: Math.round((w.colStart - 1) * (COL_WIDTH + CANVAS_GAP)),
+      y: Math.round((w.rowStart - 1) * (ROW_HEIGHT + CANVAS_GAP)),
+    },
+    defaultSize: {
+      width: Math.round(w.colSpan * COL_WIDTH + (w.colSpan - 1) * CANVAS_GAP),
+      height: Math.round(w.rowSpan * ROW_HEIGHT + (w.rowSpan - 1) * CANVAS_GAP),
+    },
+    drag: w.drag,
+    resize: w.resize,
+    settings: w.settings,
+    delete: w.delete,
+    config: w.config,
+  }));
+}
+
+const WIDGET_TYPES: Array<{
+  type: PlaygroundWidget["type"];
   label: string;
   emoji: string;
-  defaultConfig: WidgetConfig["config"];
+  defaultConfig: PlaygroundWidget["config"];
 }> = [
   { type: "kpi", label: "KPI Card", emoji: "◈", defaultConfig: { format: "number" } },
   { type: "bar_chart", label: "Bar Chart", emoji: "▐", defaultConfig: {} },
@@ -22,7 +71,7 @@ const WIDGET_TYPES: Array<{
   { type: "sunburst", label: "Sunburst", emoji: "✺", defaultConfig: {} },
 ];
 
-const TYPE_COLORS: Record<WidgetConfig["type"], string> = {
+const TYPE_COLORS: Record<PlaygroundWidget["type"], string> = {
   kpi: "rgba(99,102,241,0.12)",
   bar_chart: "rgba(34,211,238,0.08)",
   line_chart: "rgba(168,85,247,0.08)",
@@ -35,7 +84,7 @@ const TYPE_COLORS: Record<WidgetConfig["type"], string> = {
   sunburst: "rgba(132,204,22,0.08)",
 };
 
-const TYPE_BORDER: Record<WidgetConfig["type"], string> = {
+const TYPE_BORDER: Record<PlaygroundWidget["type"], string> = {
   kpi: "rgba(99,102,241,0.3)",
   bar_chart: "rgba(34,211,238,0.2)",
   line_chart: "rgba(168,85,247,0.25)",
@@ -48,7 +97,160 @@ const TYPE_BORDER: Record<WidgetConfig["type"], string> = {
   sunburst: "rgba(132,204,22,0.2)",
 };
 
-function makeWidget(type: WidgetConfig["type"], idx: number): WidgetConfig {
+const CHART_SAMPLES = [
+  { n: "Jan", v: 42 }, { n: "Feb", v: 38 }, { n: "Mar", v: 61 },
+  { n: "Apr", v: 55 }, { n: "May", v: 78 }, { n: "Jun", v: 69 }, { n: "Jul", v: 85 },
+];
+
+const PIE_SAMPLES = [
+  { n: "Direct", v: 40 }, { n: "Social", v: 28 },
+  { n: "Email", v: 18 }, { n: "Other", v: 14 },
+];
+
+const SCATTER_SAMPLES = Array.from({ length: 10 }, (_, i) => ({
+  x: Math.round(12 + i * 8 + Math.sin(i) * 6),
+  y: Math.round(18 + i * 6 + Math.cos(i) * 9),
+}));
+
+const KPI_SAMPLES: Record<string, { value: string; trend: string }> = {
+  number:   { value: "2,847", trend: "+12%" },
+  currency: { value: "$84.2K", trend: "+5%" },
+  percent:  { value: "67%",   trend: "+6%" },
+};
+
+const TYPE_ACCENT: Record<PlaygroundWidget["type"], string> = {
+  kpi:           "#6366f1",
+  bar_chart:     "#22d3ee",
+  line_chart:    "#a855f7",
+  area_chart:    "#22c55e",
+  pie_chart:     "#fb923c",
+  scatter_chart: "#f472b6",
+  radar_chart:   "#facc15",
+  heatmap:       "#ef4444",
+  treemap:       "#14b8a6",
+  sunburst:      "#84cc16",
+};
+
+const TT_STYLE: React.CSSProperties = {
+  background: "var(--bg-elevated)",
+  border: "1px solid var(--border)",
+  borderRadius: 6,
+  fontSize: 11,
+  color: "var(--text-primary)",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+  padding: "4px 8px",
+};
+
+function WidgetPreview({ widget }: { widget: PlaygroundWidget }) {
+  const accent = TYPE_ACCENT[widget.type] ?? "#6366f1";
+  const chartH = 90;
+
+  switch (widget.type) {
+    case "kpi": {
+      const fmt = widget.config?.format ?? "number";
+      const kpi = KPI_SAMPLES[fmt] ?? KPI_SAMPLES.number;
+      return (
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1, paddingTop: 8 }}>
+          <div style={{ fontSize: "1.6rem", fontWeight: 800, fontFamily: "var(--font-display)", letterSpacing: "-0.03em", color: "var(--text-primary)" }}>
+            {kpi.value}
+          </div>
+          <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginTop: 2, fontFamily: "var(--font-mono)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+            {widget.title}
+          </div>
+          <div style={{ fontSize: "0.72rem", color: "#22c55e", marginTop: 6, fontFamily: "var(--font-mono)", fontWeight: 600 }}>
+            ↑ {kpi.trend}
+          </div>
+        </div>
+      );
+    }
+    case "line_chart":
+      return (
+        <div style={{ flex: 1, minHeight: chartH, paddingTop: 8 }}>
+          <ResponsiveContainer width="100%" height={chartH}>
+            <LineChart data={CHART_SAMPLES} margin={{ top: 4, right: 4, left: -32, bottom: 0 }}>
+              <Line type="monotone" dataKey="v" stroke={accent} strokeWidth={2} dot={false} />
+              <Tooltip contentStyle={TT_STYLE} formatter={(v) => [v, ""]} labelFormatter={() => ""} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      );
+    case "area_chart":
+      return (
+        <div style={{ flex: 1, minHeight: chartH, paddingTop: 8 }}>
+          <ResponsiveContainer width="100%" height={chartH}>
+            <AreaChart data={CHART_SAMPLES} margin={{ top: 4, right: 4, left: -32, bottom: 0 }}>
+              <defs>
+                <linearGradient id={`ag-${widget.id}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={accent} stopOpacity={0.4} />
+                  <stop offset="100%" stopColor={accent} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <Area type="monotone" dataKey="v" stroke={accent} strokeWidth={2} fill={`url(#ag-${widget.id})`} dot={false} />
+              <Tooltip contentStyle={TT_STYLE} formatter={(v) => [v, ""]} labelFormatter={() => ""} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      );
+    case "bar_chart":
+      return (
+        <div style={{ flex: 1, minHeight: chartH, paddingTop: 8 }}>
+          <ResponsiveContainer width="100%" height={chartH}>
+            <BarChart data={CHART_SAMPLES} margin={{ top: 4, right: 4, left: -32, bottom: 0 }}>
+              <Bar dataKey="v" fill={accent} radius={[2, 2, 0, 0]} />
+              <Tooltip contentStyle={TT_STYLE} formatter={(v) => [v, ""]} labelFormatter={() => ""} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      );
+    case "pie_chart":
+      return (
+        <div style={{ flex: 1, minHeight: chartH, paddingTop: 4 }}>
+          <ResponsiveContainer width="100%" height={chartH}>
+            <PieChart>
+              <Pie data={PIE_SAMPLES} dataKey="v" cx="50%" cy="50%" outerRadius={36} strokeWidth={0}>
+                {PIE_SAMPLES.map((_, i) => (
+                  <Cell key={i} fill={[accent, `${accent}bb`, `${accent}77`, `${accent}44`][i] ?? accent} />
+                ))}
+              </Pie>
+              <Tooltip contentStyle={TT_STYLE} />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      );
+    case "scatter_chart":
+      return (
+        <div style={{ flex: 1, minHeight: chartH, paddingTop: 8 }}>
+          <ResponsiveContainer width="100%" height={chartH}>
+            <ScatterChart margin={{ top: 4, right: 4, left: -32, bottom: 0 }}>
+              <ZAxis range={[24, 40]} />
+              <Scatter data={SCATTER_SAMPLES} fill={accent} fillOpacity={0.75} />
+              <Tooltip contentStyle={TT_STYLE} cursor={false} />
+            </ScatterChart>
+          </ResponsiveContainer>
+        </div>
+      );
+    default:
+      return (
+        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", paddingTop: 8 }}>
+          <div style={{
+            width: "100%", height: chartH, borderRadius: 6,
+            background: `linear-gradient(135deg, ${accent}22 0%, ${accent}44 100%)`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            flexDirection: "column", gap: 6,
+          }}>
+            <span style={{ fontSize: "1.5rem", opacity: 0.65 }}>
+              {WIDGET_TYPES.find(t => t.type === widget.type)?.emoji ?? "⊞"}
+            </span>
+            <span style={{ fontSize: "0.65rem", fontFamily: "var(--font-mono)", color: accent, opacity: 0.9, letterSpacing: "0.05em", textTransform: "uppercase" }}>
+              {widget.type.replace(/_/g, " ")}
+            </span>
+          </div>
+        </div>
+      );
+  }
+}
+
+function makeWidget(type: PlaygroundWidget["type"], idx: number): PlaygroundWidget {
   const info = WIDGET_TYPES.find((w) => w.type === type)!;
   return {
     id: `widget-${idx}`,
@@ -100,7 +302,7 @@ function Toggle({
 
 export function PlaygroundApp() {
   const [tab, setTab] = useState<"builder" | "import">("builder");
-  const [widgets, setWidgets] = useState<WidgetConfig[]>([]);
+  const [widgets, setWidgets] = useState<PlaygroundWidget[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [codeOpen, setCodeOpen] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -111,14 +313,14 @@ export function PlaygroundApp() {
 
   const selected = widgets.find((w) => w.id === selectedId) ?? null;
 
-  const addWidget = useCallback((type: WidgetConfig["type"]) => {
+  const addWidget = useCallback((type: PlaygroundWidget["type"]) => {
     const w = makeWidget(type, ++widgetCounter.current);
     setWidgets((prev) => [...prev, w]);
     setSelectedId(w.id);
   }, []);
 
   const updateSelected = useCallback(
-    (patch: Partial<WidgetConfig>) => {
+    (patch: Partial<PlaygroundWidget>) => {
       setWidgets((prev) =>
         prev.map((w) => (w.id === selectedId ? { ...w, ...patch } : w))
       );
@@ -127,7 +329,7 @@ export function PlaygroundApp() {
   );
 
   const updateConfig = useCallback(
-    (patch: Partial<WidgetConfig["config"]>) => {
+    (patch: Partial<PlaygroundWidget["config"]>) => {
       setWidgets((prev) =>
         prev.map((w) =>
           w.id === selectedId ? { ...w, config: { ...w.config, ...patch } } : w
@@ -166,16 +368,16 @@ export function PlaygroundApp() {
         throw new Error(err.error ?? "Analysis failed");
       }
       const data = await resp.json();
-      const imported: WidgetConfig[] = (data.widgets ?? []).map(
+      const imported: PlaygroundWidget[] = (data.widgets ?? []).map(
         (w: {
           id: string;
-          type: WidgetConfig["type"];
+          type: PlaygroundWidget["type"];
           title: string;
           colStart: number;
           colSpan: number;
           rowStart: number;
           rowSpan: number;
-          config: WidgetConfig["config"];
+          config: PlaygroundWidget["config"];
         }) => ({
           id: w.id ?? `widget-${++widgetCounter.current}`,
           type: w.type,
@@ -200,7 +402,7 @@ export function PlaygroundApp() {
     }
   }, []);
 
-  const generatedCode = generateDashboardCode(widgets);
+  const generatedCode = generateDashboardCode(playgroundToCodegen(widgets));
 
   return (
     <div style={{ height: "calc(100vh - 60px)", display: "flex", flexDirection: "column" }}>
@@ -345,14 +547,18 @@ export function PlaygroundApp() {
                         gridColumn: `${w.colStart} / span ${w.colSpan}`,
                         background: TYPE_COLORS[w.type],
                         borderColor: selectedId === w.id ? "var(--accent)" : TYPE_BORDER[w.type],
+                        display: "flex",
+                        flexDirection: "column",
+                        minHeight: 160,
                       }}
                     >
+                      {/* Header */}
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                         <div>
-                          <p style={{ fontFamily: "var(--font-mono)", fontSize: "0.68rem", color: "var(--text-muted)", margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                            {w.type.replace("_", " ")}
+                          <p style={{ fontFamily: "var(--font-mono)", fontSize: "0.65rem", color: "var(--text-muted)", margin: "0 0 2px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                            {w.type.replace(/_/g, " ")}
                           </p>
-                          <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "0.95rem", margin: 0 }}>
+                          <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "0.88rem", margin: 0, color: "var(--text-primary)" }}>
                             {w.title}
                           </p>
                         </div>
@@ -362,7 +568,10 @@ export function PlaygroundApp() {
                           ✕
                         </button>
                       </div>
-                      <div style={{ marginTop: 8, display: "flex", gap: 4, flexWrap: "wrap" }}>
+                      {/* Real widget preview */}
+                      <WidgetPreview widget={w} />
+                      {/* Prop tags */}
+                      <div style={{ marginTop: "auto", paddingTop: 6, display: "flex", gap: 4, flexWrap: "wrap" }}>
                         {w.drag && <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.65rem", padding: "2px 6px", background: "var(--accent-subtle)", color: "var(--accent-hover)", borderRadius: 4 }}>drag</span>}
                         {w.resize && <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.65rem", padding: "2px 6px", background: "var(--accent-subtle)", color: "var(--accent-hover)", borderRadius: 4 }}>resize</span>}
                         {w.settings && <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.65rem", padding: "2px 6px", background: "var(--accent-subtle)", color: "var(--accent-hover)", borderRadius: 4 }}>settings</span>}
@@ -459,7 +668,7 @@ export function PlaygroundApp() {
                 <button
                   onClick={async () => {
                     const { downloadProjectZip } = await import("@/lib/zipgen");
-                    await downloadProjectZip(widgets);
+                    await downloadProjectZip(playgroundToCodegen(widgets));
                   }}
                   className="btn btn-ghost" style={{ width: "100%", justifyContent: "center", fontSize: "0.85rem" }}
                 >

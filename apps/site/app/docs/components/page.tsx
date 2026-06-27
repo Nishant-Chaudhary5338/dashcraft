@@ -137,23 +137,23 @@ export default function ComponentsPage() {
         { prop: "className", type: "string", desc: "Custom class for the widget root." },
       ]} />
 
-      {/* NivoWidget */}
-      <h2 className="docs-h2" id="nivowidget">NivoWidget</h2>
+      {/* HierarchyWidget */}
+      <h2 className="docs-h2" id="hierarchywidget">HierarchyWidget</h2>
       <p className="docs-p">
-        @nivo integration for heatmap, treemap, and sunburst charts.
-        Requires the relevant <code>@nivo/*</code> packages to be installed.
+        recharts-backed treemap &amp; sunburst, plus a built-in dependency-free heatmap.
+        Treemap and sunburst require <code>recharts</code> to be installed; heatmap has no extra dependency.
       </p>
-      <Code code={`<NivoWidget
+      <Code code={`<HierarchyWidget
   title="Activity Heatmap"
   chartType="heatmap"
   data={heatmapData}
-  colorScheme="blues"
+  colors={['#6366f1', '#8b5cf6', '#ec4899']}
 />`} />
       <PropTable rows={[
-        { prop: "chartType", type: '"heatmap" | "treemap" | "sunburst"', desc: "Nivo chart type to render." },
-        { prop: "data", type: "object[]", desc: "Nivo-compatible data format for the selected chart type." },
+        { prop: "chartType", type: '"heatmap" | "treemap" | "sunburst"', desc: "Chart type to render." },
+        { prop: "data", type: "object[]", desc: "Data format for the selected chart type." },
         { prop: "title", type: "string", desc: "Chart title displayed above." },
-        { prop: "colorScheme", type: "string", default: '"nivo"', desc: "Nivo color scheme name." },
+        { prop: "colors", type: "string[]", desc: "Optional color palette for the chart." },
         { prop: "height", type: "number", default: "300", desc: "Chart height in pixels." },
         { prop: "className", type: "string", desc: "Custom class for the widget root." },
       ]} />

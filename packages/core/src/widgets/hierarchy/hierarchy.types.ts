@@ -1,13 +1,14 @@
 // ============================================================
-// Nivo Widget Types
+// Hierarchy Widget Types — treemap, sunburst, heatmap
 // ============================================================
 
 import type { DashboardCardProps } from "../../components/DashboardCard";
 
 /**
- * Supported nivo chart types.
+ * Supported hierarchy/matrix chart types.
+ * (treemap + sunburst render via recharts; heatmap via a built-in CSS-grid widget.)
  */
-export type NivoChartType = "heatmap" | "treemap" | "sunburst";
+export type HierarchyChartType = "heatmap" | "treemap" | "sunburst";
 
 /**
  * Heatmap data point.
@@ -45,40 +46,14 @@ export interface SunburstDataNode {
 }
 
 /**
- * Nivo color scheme options.
+ * Props for HierarchyWidget component.
  */
-export type NivoColorScheme =
-  | "nivo"
-  | "category10"
-  | "accent"
-  | "dark2"
-  | "paired"
-  | "pastel1"
-  | "pastel2"
-  | "set1"
-  | "set2"
-  | "set3"
-  | "brown_blueGreen"
-  | "purpleRed_green"
-  | "pink_yellowGreen"
-  | "purple_orange"
-  | "red_blue"
-  | "red_grey"
-  | "red_yellow_blue"
-  | "red_yellow_green"
-  | "spectral";
-
-/**
- * Props for NivoWidget component.
- */
-export interface NivoWidgetProps extends Omit<DashboardCardProps, "children" | "type"> {
+export interface HierarchyWidgetProps extends Omit<DashboardCardProps, "children" | "type"> {
   /** Chart type to render */
-  readonly chartType: NivoChartType;
+  readonly chartType: HierarchyChartType;
   /** Data for the chart */
   readonly data: readonly HeatmapRowData[] | readonly TreemapDataNode[] | readonly SunburstDataNode[];
-  /** Color scheme */
-  readonly colorScheme?: NivoColorScheme;
-  /** Custom colors array */
+  /** Custom colors array (used as the chart palette) */
   readonly colors?: readonly string[];
   /** Whether to animate */
   readonly animate?: boolean;
@@ -93,11 +68,10 @@ export interface NivoWidgetProps extends Omit<DashboardCardProps, "children" | "
 }
 
 /**
- * Props for individual nivo chart components.
+ * Props for individual hierarchy chart components.
  */
-export interface NivoChartComponentProps {
+export interface HierarchyChartComponentProps {
   readonly data: readonly HeatmapRowData[] | readonly TreemapDataNode[] | readonly SunburstDataNode[];
-  readonly colorScheme: NivoColorScheme;
   readonly colors: readonly string[] | undefined;
   readonly animate: boolean;
   readonly showLabels: boolean;

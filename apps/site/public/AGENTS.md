@@ -20,7 +20,7 @@ tools/codegen/          @dashcraft/mcp-codegen MCP server
 | `packages/core/src/components/DashboardCard.tsx` | Widget wrapper |
 | `packages/core/src/components/widgets/KPIWidget.tsx` | Metric card |
 | `packages/core/src/components/widgets/RechartsWidget.tsx` | recharts wrapper |
-| `packages/core/src/components/widgets/NivoWidget.tsx` | nivo wrapper |
+| `packages/core/src/components/widgets/HierarchyWidget.tsx` | recharts-backed treemap & sunburst, plus a built-in heatmap |
 
 ## How to Generate a Dashboard
 

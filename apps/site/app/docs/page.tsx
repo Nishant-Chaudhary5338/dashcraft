@@ -17,7 +17,7 @@ export default function DocsPage() {
         { href: "/docs/components#dashboardcard", label: "DashboardCard", desc: "Widget wrapper with boolean behaviour props" },
         { href: "/docs/components#kpiwidget", label: "KPIWidget", desc: "Metric cards with trend indicators" },
         { href: "/docs/components#rechartswidget", label: "RechartsWidget", desc: "recharts integration" },
-        { href: "/docs/components#nivowidget", label: "NivoWidget", desc: "@nivo integration" },
+        { href: "/docs/components#hierarchywidget", label: "HierarchyWidget", desc: "recharts treemap & sunburst, built-in heatmap" },
       ],
     },
     {

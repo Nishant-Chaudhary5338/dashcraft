@@ -56,8 +56,8 @@ export default function QuickStartPage() {
 // recharts (bar, line, area, pie, scatter, radar)
 <RechartsWidget chartType="bar" data={data} series={[...]} xAxisKey="month" />
 
-// @nivo (heatmap, treemap, sunburst)
-<NivoWidget chartType="heatmap" data={data} colorScheme="blues" />`} />
+// Hierarchy charts (recharts-backed treemap & sunburst, built-in heatmap)
+<HierarchyWidget chartType="heatmap" data={data} colors={['#6366f1', '#8b5cf6']} />`} />
 
       <h3 className="docs-h3">4. Positioning</h3>
       <p className="docs-p">

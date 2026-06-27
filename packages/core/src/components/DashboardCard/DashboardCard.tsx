@@ -301,6 +301,11 @@ export const DashboardCard = React.memo(function DashboardCard({
   const fallbackPosition = useMemo<{ x: number; y: number } | null>(() => {
     if (!isEditMode) return null;
 
+    // An explicit defaultPosition means the placement is intentional — even {0, 0}
+    // (top-left corner). Never override it with an auto-grid slot; the fallback is
+    // only for widgets that were given no position at all.
+    if (defaultPosition !== undefined) return null;
+
     const posX = widgetState?.position?.x ?? 0;
     const posY = widgetState?.position?.y ?? 0;
 
@@ -327,7 +332,7 @@ export const DashboardCard = React.memo(function DashboardCard({
     }
 
     return null;
-  }, [isEditMode, widgetState?.position?.x, widgetState?.position?.y, widgets, id]);
+  }, [isEditMode, widgetState?.position?.x, widgetState?.position?.y, widgets, id, defaultPosition]);
 
   // ==========================================================
   // Track Edit Mode Transition (skip transition when entering edit mode)
@@ -341,8 +346,8 @@ export const DashboardCard = React.memo(function DashboardCard({
   const isEnteringEditMode = isEditMode && !prevIsEditModeRef.current;
   
   if (isEnteringEditMode && containerRef.current) {
-    // Check if the widget already has a saved position in the store (from loadLayout)
-    const hasSavedPosition = widgetState && (widgetState.position.x !== 0 || widgetState.position.y !== 0);
+    // Check if the widget has a registered position in the store (even {0,0} is valid)
+    const hasSavedPosition = widgetState !== undefined;
 
     // Mark this widget as transitioning to edit mode
     // This will prevent CSS transition during the mode switch
@@ -430,11 +435,12 @@ export const DashboardCard = React.memo(function DashboardCard({
     };
 
     if (!isEditMode) {
-      // VIEW MODE: Only use absolute positioning if widget has a saved (non-default) position
-      // If position is {0, 0} (no saved layout), use CSS flow so widgets don't stack
-      const hasSavedPosition = storePosition.x !== 0 || storePosition.y !== 0;
-      if (hasSavedPosition) {
+      // VIEW MODE: use absolute positioning when the widget is registered in the store.
+      // A widget at {0,0} is valid (top-left corner) — checking for non-zero would hide it.
+      if (widgetState !== undefined) {
         return {
+          display: "flex",
+          flexDirection: "column",
           ...style,
           ...settingsStyles,
           position: "absolute" as const,
@@ -443,14 +449,17 @@ export const DashboardCard = React.memo(function DashboardCard({
           width: storeSize.width,
           height: storeSize.height,
           transform: `translate3d(${storePosition.x}px, ${storePosition.y}px, 0)`,
-          zIndex: widgetState?.zIndex ?? 0,
+          zIndex: widgetState.zIndex ?? 0,
           transition: "transform 0.2s ease, opacity 0.2s ease",
         };
       }
-      // No saved position — use CSS flow
+      // Widget not yet registered — use CSS flow with defaultSize if provided
       return {
+        display: "flex",
+        flexDirection: "column",
         ...style,
         ...settingsStyles,
+        ...(defaultSize && { width: defaultSize.width, height: defaultSize.height }),
       };
     }
 
@@ -486,6 +495,8 @@ export const DashboardCard = React.memo(function DashboardCard({
     const shouldTransition = !isFirstEditRender.current && !isTransitioningToEdit && !isDragging && !isResizing;
 
     return {
+      display: "flex",
+      flexDirection: "column",
       ...style,
       ...settingsStyles,
       position: "absolute" as const,
@@ -583,7 +594,7 @@ export const DashboardCard = React.memo(function DashboardCard({
   return (
     <div
       ref={observedRef}
-      className={`dashcraft-card relative p-1 ${className ?? ""}`}
+      className={`dashcraft-card relative p-1 rounded-lg ${className ?? ""}`}
       style={cardStyle}
       onClick={handleClick}
       data-widget-id={id}
@@ -592,7 +603,7 @@ export const DashboardCard = React.memo(function DashboardCard({
       {/* ── Edit-mode toolbar ── */}
       {isEditMode && (
         <div className="absolute inset-x-0 top-0 h-7 z-10 flex items-stretch
-          bg-slate-100/90 border-b border-slate-200/70 rounded-t overflow-hidden">
+          bg-slate-100/90 border-b border-slate-200/70 rounded-t-lg overflow-hidden">
 
           {/* Settings gear */}
           {showSettings && widgetState && (
@@ -700,7 +711,7 @@ export const DashboardCard = React.memo(function DashboardCard({
       )}
 
       {/* Content — lightweight placeholder when off-screen */}
-      <div className="dashcraft-card-content flex flex-col flex-1 min-w-0 min-h-0 overflow-hidden p-3 pt-7 pb-6">
+      <div className={`dashcraft-card-content flex flex-col flex-1 min-w-0 min-h-0 overflow-hidden rounded-lg p-3 pb-6 ${isEditMode ? "pt-7" : "pt-3"}`}>
         <div className="flex-1 min-h-0 min-w-0 w-full h-full">
           {isVisible ? content : <div className="w-full h-full min-h-25" />}
         </div>

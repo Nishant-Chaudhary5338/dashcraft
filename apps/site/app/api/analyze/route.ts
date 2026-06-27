@@ -10,8 +10,8 @@ For each widget, determine:
 1. Type: kpi, bar_chart, line_chart, area_chart, pie_chart, scatter_chart, radar_chart, heatmap, treemap, sunburst
 2. Title (from visible text, or infer from content)
 3. Grid position (12-column grid): colStart (1-12), colSpan (1-12), rowStart, rowSpan
-4. Component: KPIWidget for metrics/KPIs, RechartsWidget for most charts, NivoWidget for heatmap/treemap/sunburst
-5. Config: format (currency/percent/number for KPI), colorScheme (for nivo)
+4. Component: KPIWidget for metrics/KPIs, RechartsWidget for most charts, HierarchyWidget for heatmap/treemap/sunburst
+5. Config: format (currency/percent/number for KPI)
 
 Return ONLY valid JSON with no markdown fences:
 {

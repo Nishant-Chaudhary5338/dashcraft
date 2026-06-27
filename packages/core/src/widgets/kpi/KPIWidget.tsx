@@ -122,7 +122,7 @@ export const KPIWidget = React.memo(function KPIWidget({
   trendLabel,
   icon,
   valueColor,
-  showBackground = true,
+  showBackground = false,
   ...cardProps
 }: KPIWidgetProps): React.JSX.Element {
   // ==========================================================
@@ -147,18 +147,18 @@ export const KPIWidget = React.memo(function KPIWidget({
     <DashboardCard {...cardProps} type="kpi">
       <div
         className={`
-          w-full h-full flex flex-col items-center justify-center p-4
+          w-full h-full flex flex-col items-center justify-center p-4 rounded-lg
           ${showBackground ? "bg-gradient-to-br from-white to-gray-50" : ""}
         `}
       >
         {/* Icon */}
         {icon && (
-          <div className="mb-2 text-gray-400">
+          <div className="mb-2 opacity-50">
             {icon}
           </div>
         )}
 
-        {/* Value */}
+        {/* Value — inherits the consumer theme's text color unless overridden */}
         <div
           className="text-3xl font-bold tracking-tight"
           style={{ color: valueColor }}
@@ -167,7 +167,7 @@ export const KPIWidget = React.memo(function KPIWidget({
         </div>
 
         {/* Label */}
-        <div className="mt-1 text-sm text-gray-500 font-medium">
+        <div className="mt-1 text-sm font-medium opacity-60">
           {label}
         </div>
 

@@ -189,6 +189,9 @@ export interface ResizeHandleButtonProps {
 let documentListenerRegistered = false;
 
 function ensureDocumentListener(): void {
+  // SSR-safe: no-op on the server. Registering at import time must never touch
+  // `document` during server rendering (Next.js, Remix, etc.).
+  if (typeof document === "undefined") return;
   if (documentListenerRegistered) return;
   documentListenerRegistered = true;
 
@@ -199,7 +202,6 @@ function ensureDocumentListener(): void {
       // Check if the click is on a resize handle button
       const resizeBtn = target.closest?.("[data-resize-handle-btn]");
       if (resizeBtn) {
-        console.log("[DEBUG] Document listener: resize handle detected, blocking dnd-kit");
         e.stopImmediatePropagation();
         // Also set isResizing in the store immediately
         useDashboardStore.getState().setIsResizing(true);
@@ -207,7 +209,6 @@ function ensureDocumentListener(): void {
     },
     { capture: true }
   );
-  console.log("[DEBUG] Document-level pointerdown listener registered");
 }
 
 // Register at module load time — before any component renders,

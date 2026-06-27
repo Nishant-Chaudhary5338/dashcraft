@@ -10,9 +10,8 @@ dashcraft (`@dashcraft/core`) is an MIT-licensed React library for building admi
 
 ```bash
 npm install @dashcraft/core
-# Optional chart peer deps
+# Optional chart peer dep (powers RechartsWidget + HierarchyWidget treemap & sunburst)
 npm install recharts
-npm install @nivo/core @nivo/bar @nivo/line @nivo/pie
 ```
 
 ## Core Concepts
@@ -92,15 +91,15 @@ Chart widget backed by recharts.
 | `xAxisKey` | `string` | Key for X-axis values |
 | `title` | `string` | Widget title |
 
-### `<NivoWidget>`
-Chart widget backed by @nivo.
+### `<HierarchyWidget>`
+recharts-backed treemap & sunburst, plus a built-in dependency-free heatmap.
 
 | Prop | Type | Description |
 |------|------|-------------|
 | `chartType` | `"heatmap" \| "treemap" \| "sunburst"` | Chart type |
-| `data` | `object[]` | Nivo-compatible data |
+| `data` | `object[]` | Chart data for the selected type |
 | `title` | `string` | Widget title |
-| `colorScheme` | `string` | Nivo color scheme |
+| `colors` | `string[]` | Optional color palette |
 
 ## Hooks
 
