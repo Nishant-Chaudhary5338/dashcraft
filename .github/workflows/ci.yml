@@ -3,8 +3,27 @@ name: CI
 on:
   push:
     branches: [main]
+    # Don't burn CI minutes on docs-only / non-code changes.
+    paths-ignore:
+      - "**/*.md"
+      - "LICENSE"
+      - "**/llms.txt"
+      - "**/AGENTS.md"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".github/PULL_REQUEST_TEMPLATE.md"
+      - ".vscode/**"
+      - ".editorconfig"
   pull_request:
     branches: [main]
+    paths-ignore:
+      - "**/*.md"
+      - "LICENSE"
+      - "**/llms.txt"
+      - "**/AGENTS.md"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".github/PULL_REQUEST_TEMPLATE.md"
+      - ".vscode/**"
+      - ".editorconfig"
 
 jobs:
   build-test:

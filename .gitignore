@@ -12,8 +12,8 @@ out
 .pnpm-store
 
 # Legacy flat-library source (superseded by packages/core)
-src
-docs
+/src
+/docs
 
 # IDE / editor rules
 .clinerules
@@ -38,3 +38,7 @@ yarn-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+coverage
+.vercel
+.idea
+*.local
