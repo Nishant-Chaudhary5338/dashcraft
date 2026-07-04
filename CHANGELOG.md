@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `@dashcraft/core` are documented here.
+All notable changes to `dashcraft-core` are documented here.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -14,7 +14,7 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - AI-native files: `llms.txt`, `AGENTS.md` for LLM and agent discoverability
 - Full docs site: installation, API reference, components, hooks, 3 guides
 - `/playground` drag-and-drop builder with AI import and project zip export
-- MCP server `@dashcraft/mcp-codegen`: `analyze_dashboard`, `generate_code`, `generate_project`
+- MCP server `dashcraft-mcp-codegen`: `analyze_dashboard`, `generate_code`, `generate_project`
 
 ---
 
@@ -25,7 +25,7 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `<DashboardCard>` widget wrapper with boolean props: `drag`, `resize`, `settings`, `delete`, `responsive`
 - `<KPIWidget>` metric card with trend indicators and `currency | percentage | number | text` formats
 - `<RechartsWidget>` supporting `bar`, `line`, `area`, `pie`, `scatter`, `radar` chart types
-- `<NivoWidget>` supporting `heatmap`, `treemap`, `sunburst` chart types
+- `<HierarchyWidget>` supporting `heatmap`, `treemap`, `sunburst` chart types
 - `useDashboard` — access dashboard state, toggle edit mode
 - `useWidgetData` — push live data into widgets
 - `useWidgetEvents` — subscribe to widget interaction events

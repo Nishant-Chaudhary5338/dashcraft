@@ -1,68 +1,124 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap');
 @import "tailwindcss";
 
-/* ─── Design tokens ──────────────────────────────────────────────── */
+/* ═══ Voltage design system ══════════════════════════════════════════
+   Warm-graphite chassis · chartreuse "signal" · ember action.
+   Fonts arrive from next/font as --font-display / --font-sans / --font-mono.
+   Tailwind utilities read the @theme scale; legacy components read the
+   semantic aliases in :root below (same names as before → instant reskin). */
+@theme {
+  /* signal — chartreuse (identity / live / active) */
+  --color-voltage-50:  #F2FFD6;
+  --color-voltage-100: #E4FFAD;
+  --color-voltage-200: #D2FF70;
+  --color-voltage-300: #C2FF3D;
+  --color-voltage-400: #A9F000;
+  --color-voltage-500: #8FCC00;
+  --color-voltage-600: #6E9E00;
+  --color-voltage-700: #4F7200;
+  /* action — ember (primary CTA / warmth) */
+  --color-ember-300: #FFB08A;
+  --color-ember-400: #FF8A5B;
+  --color-ember-500: #FF6A2C;
+  --color-ember-600: #E85118;
+  --color-ember-700: #B93B0E;
+  /* warm graphite neutrals (NOT clinical gray) */
+  --color-ink-50:  #F7F5F2;
+  --color-ink-100: #ECE9E3;
+  --color-ink-200: #D8D3CA;
+  --color-ink-300: #B4ADA2;
+  --color-ink-400: #8A8377;
+  --color-ink-500: #635C52;
+  --color-ink-600: #45403A;
+  --color-ink-700: #2E2A26;
+  --color-ink-800: #201D1A;
+  --color-ink-900: #17150F;
+  --color-ink-950: #0E0C0A;
+  /* semantic */
+  --color-success: #4FB477;
+  --color-warning: #F5B301;
+  --color-danger:  #F0512F;
+  --color-info:    #3B82C4;
+
+  --font-display: var(--font-display);
+  --font-sans:    var(--font-sans);
+  --font-mono:    var(--font-mono);
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  --text-hero: clamp(30px, 6.4vw, 92px);
+}
+
+/* ─── Semantic aliases · dark (default) ──────────────────────────── */
 :root {
-  --bg-base:        #07080f;
-  --bg-surface:     #0d0f1a;
-  --bg-elevated:    #131520;
-  --bg-hover:       #191c2e;
-  --border:         #1c1f30;
-  --border-subtle:  #13151f;
-  --border-hover:   #2a2f4a;
-  --accent:         #6366f1;
-  --accent-hover:   #818cf8;
-  --accent-subtle:  rgba(99,102,241,0.10);
-  --accent-glow:    rgba(99,102,241,0.20);
-  --text-primary:   #eef0f8;
-  --text-secondary: #8891ab;
-  --text-muted:     #4e566b;
-  --code-bg:        #0b0d14;
-  --success:        #22c55e;
-  --success-subtle: rgba(34,197,94,0.10);
-  --font-display:   'Syne', sans-serif;
-  --font-body:      'DM Sans', sans-serif;
-  --font-mono:      'DM Mono', monospace;
+  --bg-base:        #0E0C0A;
+  --bg-surface:     #17150F;
+  --bg-elevated:    #201D1A;
+  --bg-hover:       #2E2A26;
+  --border:         rgba(255,252,245,0.09);
+  --border-subtle:  rgba(255,252,245,0.05);
+  --border-hover:   rgba(255,252,245,0.16);
+  --accent:         #C2FF3D;
+  --accent-hover:   #A9F000;
+  --accent-subtle:  rgba(194,255,61,0.10);
+  --accent-glow:    rgba(194,255,61,0.22);
+  --cta:            #FF6A2C;
+  --cta-hover:      #E85118;
+  --text-primary:   #F7F5F2;
+  --text-secondary: #B4ADA2;
+  --text-muted:     #8A8377;
+  --code-bg:        #120F0A;
+  --success:        #4FB477;
+  --success-subtle: rgba(79,180,119,0.14);
+  --font-body:      var(--font-sans);
   --radius-sm:      6px;
-  --radius-md:      10px;
-  --radius-lg:      14px;
-  --radius-xl:      20px;
-  --dot-color:      #1a1d2e;
+  --radius-md:      8px;
+  --radius-lg:      12px;
+  --radius-xl:      16px;
+  --dot-color:      rgba(255,252,245,0.05);
   --dot-size:       28px;
 }
 
 /* ─── Light mode tokens ──────────────────────────────────────────── */
 [data-theme="light"] {
-  --bg-base:        #f5f6fc;
-  --bg-surface:     #ffffff;
-  --bg-elevated:    #eceef8;
-  --bg-hover:       #e4e6f4;
-  --border:         #d4d7eb;
-  --border-subtle:  #e4e6f4;
-  --border-hover:   #b0b4d0;
-  --accent:         #6366f1;
-  --accent-hover:   #4f46e5;
-  --accent-subtle:  rgba(99,102,241,0.08);
-  --accent-glow:    rgba(99,102,241,0.14);
-  --text-primary:   #0f1117;
-  --text-secondary: #3d4460;
-  --text-muted:     #7c85a8;
-  --code-bg:        #eceef8;
-  --success:        #16a34a;
-  --success-subtle: rgba(22,163,74,0.08);
-  --dot-color:      #d0d3e8;
+  --bg-base:        #F7F5F2;
+  --bg-surface:     #FFFFFF;
+  --bg-elevated:    #FBFAF7;
+  --bg-hover:       #F1EEE8;
+  --border:         rgba(20,18,15,0.10);
+  --border-subtle:  rgba(20,18,15,0.06);
+  --border-hover:   rgba(20,18,15,0.20);
+  --accent:         #6E9E00;
+  --accent-hover:   #4F7200;
+  --accent-subtle:  rgba(110,158,0,0.10);
+  --accent-glow:    rgba(194,255,61,0.30);
+  --cta:            #E85118;
+  --cta-hover:      #B93B0E;
+  --text-primary:   #17150F;
+  --text-secondary: #635C52;
+  --text-muted:     #8A8377;
+  --code-bg:        #F1EEE8;
+  --success:        #3E8E5F;
+  --success-subtle: rgba(62,142,95,0.10);
+  --dot-color:      rgba(20,18,15,0.07);
 }
 
 [data-theme="light"] .nav.scrolled {
-  background: rgba(245,246,252,0.92);
+  background: rgba(247,245,242,0.90);
 }
 
 [data-theme="light"] .code-window {
   box-shadow: 0 4px 24px rgba(99,102,241,0.08);
 }
 
-/* ─── Theme transition ───────────────────────────────────────────── */
-*, *::before, *::after { transition: background-color 0.18s ease, border-color 0.18s ease, color 0.1s ease; }
+/* Theme flip transitions only the surfaces that change — scoped, not a
+   universal `*` selector (that made every hover/interaction feel sluggish). */
+:root, body, .nav, .feature-card, .code-window, .btn, .badge,
+.playground-panel, .playground-config, .dashcraft-card {
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.12s ease;
+}
 
 /* ─── Skip link ──────────────────────────────────────────────────── */
 .skip-link {
@@ -139,7 +195,7 @@ h1,h2,h3,h4,h5,h6 {
   transition: border-color 0.2s, background 0.2s;
 }
 .nav.scrolled {
-  background: rgba(7,8,15,0.88);
+  background: rgba(14,12,10,0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-color: var(--border);
@@ -188,12 +244,12 @@ h1,h2,h3,h4,h5,h6 {
 }
 .nav-link:hover { color: var(--text-primary); background: var(--bg-elevated); }
 .nav-cta {
-  font-size: 0.875rem; font-weight: 600; color: white;
-  background: var(--accent); padding: 7px 16px;
+  font-size: 0.875rem; font-weight: 600; color: #fff;
+  background: var(--cta); padding: 7px 16px;
   border-radius: var(--radius-sm); text-decoration: none;
   transition: background 0.15s, transform 0.12s, box-shadow 0.15s;
 }
-.nav-cta:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,0.35); }
+.nav-cta:hover { background: var(--cta-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255,106,44,0.32); }
 .nav-cta:active { transform: scale(0.97); }
 .nav-cta:focus-visible {
   outline: none;
@@ -209,11 +265,15 @@ h1,h2,h3,h4,h5,h6 {
   transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.12s, box-shadow 0.15s;
   letter-spacing: -0.01em;
 }
-.btn-primary { background: var(--accent); color: white; }
+.btn-primary { background: var(--cta); color: #fff; }
 .btn-primary:hover {
-  background: var(--accent-hover); transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(99,102,241,0.35);
+  background: var(--cta-hover); transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(255,106,44,0.32);
 }
+/* Chartreuse "signal" button — dark text for contrast on the bright accent. */
+.btn-signal { background: var(--accent); color: #0E0C0A; }
+.btn-signal:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 8px 24px var(--accent-glow); }
+.btn-signal:active { transform: scale(0.97); box-shadow: none; }
 .btn-primary:active { transform: scale(0.97); box-shadow: none; }
 .btn-primary:focus-visible {
   outline: none;
@@ -243,7 +303,7 @@ h1,h2,h3,h4,h5,h6 {
 }
 .badge-accent {
   color: var(--accent-hover); background: var(--accent-subtle);
-  border-color: rgba(99,102,241,0.25);
+  border-color: rgba(194,255,61,0.28);
 }
 .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
 
@@ -613,7 +673,7 @@ h1,h2,h3,h4,h5,h6 {
 .docs-step-body { flex: 1; }
 .docs-step-title { font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
 .docs-callout {
-  background: var(--accent-subtle); border: 1px solid rgba(99,102,241,0.25);
+  background: var(--accent-subtle); border: 1px solid rgba(194,255,61,0.28);
   border-radius: var(--radius-md); padding: 16px 20px; margin: 16px 0 24px;
   color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;
 }
@@ -690,7 +750,7 @@ h1,h2,h3,h4,h5,h6 {
   background: var(--accent); color: #fff; border-color: var(--accent);
   font-weight: 600;
 }
-.showcase-btn.accent:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,0.35); }
+.showcase-btn.accent:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255,106,44,0.32); }
 .showcase-btn.accent:active { transform: scale(0.97); box-shadow: none; }
 .showcase-desc {
   padding: 12px 32px; font-size: 0.8rem; color: var(--text-muted);
@@ -712,7 +772,7 @@ h1,h2,h3,h4,h5,h6 {
   box-shadow: 0 0 0 1px var(--border-subtle), 0 32px 64px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.04);
 }
 
-/* Override @dashcraft/core styles to match site theme */
+/* Override dashcraft-core styles to match site theme */
 .showcase-canvas-scroll .dashcraft-card,
 .showcase-canvas-scroll [class*="DashboardCard"],
 .showcase-canvas-scroll [class*="dashcard"] {
@@ -766,4 +826,280 @@ h1,h2,h3,h4,h5,h6 {
   .showcase-topbar { padding: 16px; }
   .showcase-canvas-wrap { padding: 16px 16px 0; }
   .showcase-tabs { flex-wrap: wrap; }
+}
+
+/* ═══ Voltage texture & motion utilities ═════════════════════════════ */
+
+/* Film grain — one fixed overlay; inline SVG feTurbulence, no image request. */
+.grain-overlay::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 60;
+  opacity: 0.05; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+[data-theme="light"] .grain-overlay::after { opacity: 0.035; mix-blend-mode: multiply; }
+
+/* Thermal mesh — warm brand-hue glow fields, blurred, slowly drifting. */
+.thermal { position: absolute; inset: -10%; z-index: 0; filter: blur(130px); opacity: 0.5; pointer-events: none; }
+.thermal::before, .thermal::after { content: ""; position: absolute; border-radius: 50%; will-change: transform; }
+.thermal::before {
+  width: 46vw; height: 46vw; left: -6vw; top: -8vw;
+  background: radial-gradient(circle at 30% 30%, rgba(194,255,61,0.40), transparent 60%);
+  animation: drift 26s ease-in-out infinite alternate;
+}
+.thermal::after {
+  width: 40vw; height: 40vw; right: -4vw; bottom: -10vw;
+  background: radial-gradient(circle at 70% 70%, rgba(255,106,44,0.34), transparent 62%);
+  animation: drift 32s ease-in-out infinite alternate-reverse;
+}
+@keyframes drift { to { transform: translate3d(6%, -4%, 0) scale(1.12); } }
+[data-theme="light"] .thermal { opacity: 0.32; }
+
+/* Section eyebrow — mono coordinate marker. */
+.eyebrow {
+  font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--accent);
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.eyebrow::before { content: ""; width: 24px; height: 1px; background: var(--accent); display: inline-block; }
+
+/* Kinetic outline marquee band. */
+.marquee { overflow: hidden; white-space: nowrap; border-block: 1px solid var(--border); }
+.marquee-track { display: inline-flex; align-items: center; gap: 2.2rem; padding-block: 20px; animation: marquee 34s linear infinite; }
+.marquee-word {
+  font-family: var(--font-display); font-weight: 800; font-size: clamp(28px, 4vw, 52px);
+  letter-spacing: -0.02em; color: transparent; -webkit-text-stroke: 1px var(--text-muted);
+}
+.marquee-word.on { -webkit-text-stroke-color: var(--accent); }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+/* LED glow — only on live/active elements. */
+.glow-signal { box-shadow: 0 0 0 1px var(--accent), 0 0 24px -4px var(--accent-glow); }
+
+@media (prefers-reduced-motion: reduce) {
+  .thermal::before, .thermal::after, .marquee-track { animation: none !important; }
+  html { scroll-behavior: auto; }
+}
+
+/* ═══ Playground (rebuilt on the real dashcraft-core Dashboard) ══════ */
+.pg-shell { display: flex; flex-direction: column; height: calc(100vh - 60px); }
+.pg-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 48px; padding: 0 20px; flex-shrink: 0;
+  border-bottom: 1px solid var(--border); background: var(--bg-surface);
+}
+.pg-brand-tab { font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; letter-spacing: -0.01em; }
+.pg-body { display: grid; grid-template-columns: 220px 1fr 300px; flex: 1; overflow: hidden; }
+.pg-canvas-scroll { position: relative; overflow: auto; background: var(--bg-base); padding: 24px; }
+.config-heading {
+  font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin: 0 0 10px;
+}
+.config-widget-row {
+  display: flex; flex-direction: column; gap: 1px; width: 100%; text-align: left;
+  padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid transparent;
+  background: var(--bg-elevated); color: var(--text-primary); cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.config-widget-row:hover { border-color: var(--border-hover); }
+.config-widget-row.selected { border-color: var(--accent); background: var(--accent-subtle); }
+.config-field-label { font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 6px; }
+.config-input {
+  width: 100%; background: var(--bg-elevated); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 7px 10px; color: var(--text-primary);
+  font-family: var(--font-body); font-size: 0.875rem; outline: none;
+}
+.config-input:focus { border-color: var(--accent); }
+.pg-code-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--border); }
+.pg-code-body { padding: 16px 20px; font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.8; overflow: auto; height: calc(45vh - 48px); color: var(--text-secondary); }
+
+@media (max-width: 900px) {
+  .pg-shell { height: auto; min-height: calc(100vh - 60px); }
+  .pg-body { grid-template-columns: 1fr; }
+  .playground-panel { border-bottom: 1px solid var(--border); }
+  .playground-panel > div { overflow-x: auto; }
+  .playground-panel .config-heading + div { flex-direction: row !important; flex-wrap: wrap; }
+  .pg-canvas-scroll { min-height: 60vh; }
+  .playground-config { border-top: 1px solid var(--border); }
+}
+
+/* Playground tabs + AI-import dropzone */
+.pg-tabs { display: flex; gap: 4px; }
+.pg-tab {
+  font-family: var(--font-body); font-size: 0.85rem; font-weight: 500;
+  padding: 5px 14px; border-radius: var(--radius-sm); border: none; cursor: pointer;
+  background: transparent; color: var(--text-muted); transition: background 0.15s, color 0.15s;
+}
+.pg-tab.active { background: var(--bg-elevated); color: var(--text-primary); }
+.pg-dropzone {
+  border: 1.5px dashed var(--border-hover); border-radius: var(--radius-xl);
+  padding: 48px 32px; text-align: center; cursor: pointer;
+  background: var(--bg-surface); transition: border-color 0.2s, background 0.2s;
+}
+.pg-dropzone:hover { border-color: var(--accent); background: var(--accent-subtle); }
+
+/* ═══ Templates Gallery ══════════════════════════════════════════════ */
+.tpl-card {
+  display: flex; flex-direction: column;
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  background: var(--bg-surface); overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.tpl-card:hover { border-color: var(--border-hover); transform: translateY(-3px); }
+.tpl-poster-frame { padding: 16px; border-bottom: 1px solid var(--border); background: var(--bg-base); }
+.tpl-poster { position: relative; border-radius: var(--radius-md); }
+.tpl-card-body { padding: 18px 20px; }
+.tpl-tile {
+  --tpl-accent: var(--accent); --tpl-accent2: var(--cta);
+  border: 1px solid var(--border); border-radius: 12px;
+  background: var(--bg-elevated); padding: 16px; overflow: hidden;
+}
+.tpl-tile-label { font-family: var(--font-mono); font-size: 15px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin: 0; }
+.tpl-tile-value { font-family: var(--font-display); font-weight: 800; font-size: 40px; letter-spacing: -0.02em; color: var(--text-primary); margin: 6px 0 0; }
+.tpl-code { border-top: 1px solid var(--border); background: var(--code-bg); }
+.tpl-code-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; border-bottom: 1px solid var(--border); }
+.tpl-code-body { margin: 0; padding: 12px 14px; font-family: var(--font-mono); font-size: 0.72rem; line-height: 1.7; color: var(--text-secondary); max-height: 240px; overflow: auto; white-space: pre-wrap; }
+
+/* Theme filter variants — same markup, re-skinned tiles (headless proof). */
+.tpl-theme-brutalist .tpl-tile {
+  --tpl-accent: #FF6A2C; --tpl-accent2: #C2FF3D;
+  border: 2px solid var(--text-primary); border-radius: 0; background: var(--bg-base);
+  box-shadow: 4px 4px 0 var(--text-primary);
+}
+.tpl-theme-brutalist .tpl-tile-value { font-family: var(--font-mono); }
+.tpl-theme-glass .tpl-tile {
+  --tpl-accent: #C2FF3D; --tpl-accent2: #8FCC00;
+  border: 1px solid rgba(255,255,255,0.14); border-radius: 16px;
+  background: rgba(255,255,255,0.06); backdrop-filter: blur(6px);
+}
+
+/* ═══ Hero live board (real dashcraft-core Dashboard, 3D) ════════════ */
+.hero-board { display: flex; justify-content: center; }
+.hero-board-card {
+  background: linear-gradient(180deg, var(--bg-elevated), var(--bg-surface));
+  border: 1px solid var(--border); border-radius: 16px; padding: 14px;
+  box-shadow: 0 40px 80px -40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+[data-theme="light"] .hero-board-card {
+  box-shadow: 0 30px 60px -34px rgba(20,18,15,0.28), inset 0 1px 0 rgba(255,255,255,0.7);
+}
+.hero-board-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding: 0 4px; }
+.hero-board-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--bg-hover); }
+.hero-board-live { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; color: var(--accent); display: flex; align-items: center; gap: 6px; }
+.hero-board-led { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+/* Hero widgets: keep them clean (small labels/values fit the compact board). */
+.hero-board .dashcraft-card { background: var(--bg-elevated); border: 1px solid var(--border); }
+@media (max-width: 500px) {
+  .hero-board { transform: scale(0.72); transform-origin: top center; height: 300px; }
+}
+
+/* ═══ QA fixes ═══════════════════════════════════════════════════════ */
+/* Widget toolbar: drop the light "white bar" bg + divider; keep the buttons
+   (drag handle, delete) floating transparently over the card top. */
+:root {
+  --dc-toolbar-bg: transparent;
+  --dc-toolbar-border: transparent;
+  --dc-toolbar-fg: var(--text-muted);
+  --dc-toolbar-fg-strong: var(--text-primary);
+  --dc-toolbar-hover: var(--bg-hover);
+  --dc-toolbar-accent: var(--accent);
+}
+.dc-toolbar { border-bottom: 0 !important; }
+
+/* Glass template skin: readable in light mode (dark translucency on paper). */
+[data-theme="light"] .tpl-theme-glass .tpl-tile {
+  background: rgba(20,18,15,0.045); border-color: rgba(20,18,15,0.14); backdrop-filter: blur(6px);
+}
+
+/* Playground topbar wraps instead of overflowing on small screens. */
+@media (max-width: 640px) {
+  .pg-topbar { height: auto; flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
+}
+
+/* Docs code blocks / tables never force horizontal page scroll. */
+.docs-content pre, .docs-content table, pre[class*="code"], .docs-table {
+  max-width: 100%; overflow-x: auto; display: block;
+}
+
+/* Templates gallery: posters + cards clip to their frame (no mobile overflow). */
+.tpl-poster, .tpl-poster-frame, .tpl-card { max-width: 100%; overflow: hidden; }
+
+/* Hero: let the grid columns shrink below the board's intrinsic width. */
+.hero-grid { min-width: 0; }
+.hero-grid > * { min-width: 0; }
+
+/* Mobile navigation (hamburger) */
+.nav-burger {
+  display: none; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: transparent; color: var(--text-primary); cursor: pointer;
+}
+.nav-mobile { display: none; }
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav-cta-desktop { display: none; }
+  .nav-burger { display: flex; }
+  .nav-mobile {
+    display: flex; flex-direction: column; gap: 2px;
+    padding: 10px 16px 18px;
+    background: rgba(14,12,10,0.97); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  [data-theme="light"] .nav-mobile { background: rgba(247,245,242,0.98); }
+  .nav-mobile-link {
+    font-size: 0.95rem; color: var(--text-secondary); text-decoration: none;
+    padding: 11px 8px; border-radius: var(--radius-sm);
+  }
+  .nav-mobile-link:hover { color: var(--text-primary); background: var(--bg-elevated); }
+}
+
+/* Footer grid collapses on mobile (was a fixed 4-col → page overflow). */
+.footer-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+@media (max-width: 720px) { .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px !important; } }
+@media (max-width: 400px) { .footer-grid { grid-template-columns: 1fr; } }
+
+/* ═══ Playground UX v2 — icon rail + contextual config ═══════════════ */
+/* Canvas is the star: a slim icon rail (names on hover) + config that only
+   appears when a widget is selected. */
+.pg-body { grid-template-columns: 56px minmax(0, 1fr) 0; }
+.pg-body.cfg-open { grid-template-columns: 56px minmax(0, 1fr) 300px; }
+
+.pg-rail { padding: 10px 0; overflow: visible; }
+.pg-rail-list { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.pg-icon-btn {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: 9px;
+  border: 1px solid var(--border); background: var(--bg-elevated);
+  color: var(--text-secondary); cursor: pointer; transition: border-color .12s, color .12s, background .12s;
+}
+.pg-icon-btn:hover { border-color: var(--accent); color: var(--text-primary); background: var(--bg-hover); }
+.pg-icon-glyph { font-size: 1.05rem; line-height: 1; }
+.pg-icon-tip {
+  position: absolute; left: 50px; top: 50%; transform: translateY(-50%) scale(0.94);
+  transform-origin: left center; white-space: nowrap;
+  background: var(--bg-elevated); border: 1px solid var(--border-hover); color: var(--text-primary);
+  font-family: var(--font-body); font-size: 0.78rem; padding: 5px 10px; border-radius: 7px;
+  opacity: 0; pointer-events: none; transition: opacity .12s ease, transform .12s ease;
+  z-index: 30; box-shadow: 0 8px 22px rgba(0,0,0,0.35);
+}
+.pg-icon-btn:hover .pg-icon-tip { opacity: 1; transform: translateY(-50%) scale(1); }
+
+/* Shared panel header (config close). */
+.pg-panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px 0 16px;
+}
+.pg-collapse {
+  display: flex; align-items: center; justify-content: center; width: 26px; height: 26px;
+  border-radius: 6px; border: 1px solid var(--border); background: transparent;
+  color: var(--text-muted); cursor: pointer; font-size: 0.9rem; line-height: 1;
+}
+.pg-collapse:hover { color: var(--text-primary); border-color: var(--border-hover); background: var(--bg-elevated); }
+
+/* On tablet/mobile the config becomes a right-side overlay drawer. */
+@media (max-width: 900px) {
+  .pg-body, .pg-body.cfg-open { grid-template-columns: 56px minmax(0,1fr); }
+  .playground-config {
+    position: fixed; top: 60px; right: 0; bottom: 0; width: min(320px, 86vw);
+    z-index: 60; box-shadow: -10px 0 34px rgba(0,0,0,0.4); overflow-y: auto;
+  }
 }

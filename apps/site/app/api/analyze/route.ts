@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 
 const SYSTEM_PROMPT = `You are a UI analysis expert specializing in dashboard components.
-Analyze dashboard images and map widgets to @dashcraft/core React components.`;
+Analyze dashboard images and map widgets to dashcraft-core React components.`;
 
 const USER_PROMPT = `Analyze this dashboard image. Identify every distinct widget or panel.
 
@@ -40,18 +40,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "imageBase64 required" }, { status: 400 });
     }
 
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    // Bring-your-own-key: the visitor supplies their own Anthropic key (sent
+    // per-request via header, never stored server-side). Fall back to a server
+    // key only if one is configured for local/self-hosting.
+    const apiKey =
+      req.headers.get("x-anthropic-key")?.trim() || process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "ANTHROPIC_API_KEY not configured on server" },
-        { status: 503 }
+        { error: "MISSING_KEY", message: "Add your Anthropic API key to use AI import." },
+        { status: 401 }
       );
     }
 
     const client = new Anthropic({ apiKey });
 
     const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
+      model: "claude-sonnet-5",
       max_tokens: 2048,
       system: SYSTEM_PROMPT,
       messages: [

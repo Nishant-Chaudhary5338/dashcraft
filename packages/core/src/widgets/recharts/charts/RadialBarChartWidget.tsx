@@ -12,6 +12,30 @@ import type { ChartComponentProps } from "../recharts.types";
 // RadialBarChartWidget Component
 // ============================================================
 
+/**
+ * Renders a recharts `<RadialBarChart>` (semicircle gauge layout, 180°→0°) —
+ * one `<RadialBar>` per series with an inline value label. `xAxisKey` and
+ * `showGrid` are not applicable and ignored. Used internally by
+ * {@link RechartsWidget} when `chartType="radialBar"`.
+ *
+ * @param props - {@link ChartComponentProps} (`xAxisKey`/`showGrid` accepted but unused).
+ * @returns A `ResponsiveContainer`-wrapped recharts radial bar chart.
+ *
+ * @example
+ * ```tsx
+ * import { RechartsWidget } from "@dashcraft/core";
+ *
+ * <RechartsWidget
+ *   chartType="radialBar"
+ *   id="completion"
+ *   title="Completion"
+ *   data={[{ name: "Progress", value: 72 }]}
+ *   series={[{ dataKey: "value", color: "#f59e0b" }]}
+ * />
+ * ```
+ *
+ * @see {@link RechartsWidget}
+ */
 export const RadialBarChartWidget = React.memo(function RadialBarChartWidget({
   data,
   series,

@@ -15,6 +15,23 @@ import type { ChartComponentProps } from "../recharts.types";
 // LineChartWidget Component
 // ============================================================
 
+/**
+ * Renders a recharts `<LineChart>` — one monotone `<Line>` per series with a
+ * filled dot marker. Used internally by {@link RechartsWidget} when
+ * `chartType="line"`.
+ *
+ * @param props - {@link ChartComponentProps}.
+ * @returns A `ResponsiveContainer`-wrapped recharts line chart.
+ *
+ * @example
+ * ```tsx
+ * import { RechartsWidget } from "@dashcraft/core";
+ *
+ * <RechartsWidget chartType="line" id="trend" title="Trend" data={data} series={series} />
+ * ```
+ *
+ * @see {@link RechartsWidget}
+ */
 export const LineChartWidget = React.memo(function LineChartWidget({
   data,
   series,

@@ -4,8 +4,14 @@ import React, { useCallback } from "react";
 // Props
 // ============================================================
 
+/**
+ * Props for {@link SettingsPollingSection}.
+ */
 export interface SettingsPollingSectionProps {
+  /** Current polling interval in milliseconds. `0` means polling is off. */
   pollingInterval: number;
+  /** Called with a single-element array `[intervalMs]` whenever the select changes
+   * (array shape matches Radix Slider's `onValueChange` convention used elsewhere in Settings). */
   onChange: (value: number[]) => void;
 }
 
@@ -13,6 +19,7 @@ export interface SettingsPollingSectionProps {
 // Options
 // ============================================================
 
+/** Fixed set of selectable polling intervals, in milliseconds. `0` = "Off". */
 const POLLING_OPTIONS: Array<{ label: string; value: number }> = [
   { label: "Off",  value: 0 },
   { label: "5s",   value: 5_000 },
@@ -26,6 +33,22 @@ const POLLING_OPTIONS: Array<{ label: string; value: number }> = [
 // Component
 // ============================================================
 
+/**
+ * Settings section that lets the user pick how often a widget re-fetches its
+ * data via a fixed-option `<select>` (Off, 5s, 15s, 30s, 1m, 5m).
+ *
+ * @example
+ * ```tsx
+ * import { SettingsPollingSection } from "@dashcraft/core";
+ *
+ * <SettingsPollingSection
+ *   pollingInterval={settings.pollingInterval ?? 0}
+ *   onChange={([interval]) => updateSettings({ pollingInterval: interval })}
+ * />
+ * ```
+ *
+ * @see {@link SettingsPanel} for the container that composes this section.
+ */
 export const SettingsPollingSection = React.memo(
   function SettingsPollingSection({
     pollingInterval,

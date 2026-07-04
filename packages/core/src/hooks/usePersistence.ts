@@ -92,6 +92,16 @@ export interface UsePersistenceReturn<T> {
  *   </div>
  * );
  * ```
+ *
+ * On mount, the hook always attempts a {@link UsePersistenceReturn.load}
+ * from the adapter; if nothing is stored (or loading fails), `value`
+ * falls back to `defaultValue`. Auto-save only kicks in after this
+ * initial load completes and only while the value is "dirty" (changed via
+ * {@link UsePersistenceReturn.setValue} since the last save/load), so it
+ * never re-saves an untouched value it just loaded.
+ *
+ * @see {@link usePersistedState} for a simpler `useState`-like API when
+ * you don't need save/load/error state.
  */
 export function usePersistence<T>(options: UsePersistenceOptions<T>): UsePersistenceReturn<T> {
   const {
@@ -275,6 +285,17 @@ export function usePersistence<T>(options: UsePersistenceOptions<T>): UsePersist
  *   </button>
  * );
  * ```
+ *
+ * Internally this is {@link usePersistence} with `autoSave: true` and only
+ * `value`/`setValue` exposed — reach for `usePersistence` directly if you
+ * need loading/saving/error state or manual save/load/clear control.
+ *
+ * @param key - Storage key, unique per persisted value.
+ * @param defaultValue - Value used until a stored value is loaded (or if
+ * none exists / loading fails).
+ * @returns A `[value, setValue]` tuple, mirroring `useState`.
+ *
+ * @see {@link usePersistence}
  */
 export function usePersistedState<T>(
   key: string,

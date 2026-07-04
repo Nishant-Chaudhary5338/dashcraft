@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useCallback, useState, useRef } from "react";
-import { Settings, Trash2, GripHorizontal, ChevronRight } from "lucide-react";
 import type {
   WidgetConfig,
   Position,
@@ -10,7 +9,7 @@ import type {
 import type { ResizeHandle } from "../../hooks/useResize";
 import { useDashboardContext } from "../Dashboard/Dashboard.context";
 import { ResizeHandleButton } from "./WidgetActions";
-import { SettingsPanel } from "../Settings/SettingsPanel";
+import { DashboardCardToolbar } from "./DashboardCardToolbar";
 import { useResponsive } from "../../hooks/useResponsive";
 import { useDraggable } from "../../hooks/useDraggable";
 import { useResize } from "../../hooks/useResize";
@@ -38,47 +37,164 @@ const capturedPositionsRef = new Map<string, { x: number; y: number; width: numb
 // DashboardCard Props
 // ============================================================
 
+/**
+ * Props for {@link DashboardCard} — the draggable, resizable container that wraps
+ * a single widget on a {@link Dashboard}.
+ *
+ * The feature flags (`drag`, `resize`, `delete`, `settings`) gate the affordances a
+ * user gets in edit mode. Each flag also has a longer-form alias
+ * (`draggable`/`resizable`/`deletable`/`showSettings`) — the aliases are documented
+ * for discoverability, but the canonical prop names are the short forms below.
+ *
+ * @example
+ * ```tsx
+ * import { Dashboard, DashboardCard } from "@dashcraft/core";
+ *
+ * <Dashboard persistenceKey="sales">
+ *   <DashboardCard
+ *     id="revenue"
+ *     title="Revenue"
+ *     defaultPosition={{ x: 20, y: 20 }}
+ *     defaultSize={{ width: 320, height: 220 }}
+ *     viewSizes={[{ width: 320, height: 220 }, { width: 640, height: 360 }]}
+ *   >
+ *     <RevenueChart />
+ *   </DashboardCard>
+ * </Dashboard>
+ * ```
+ *
+ * @see {@link DashboardCard} for the component.
+ * @see {@link Dashboard} for the provider that supplies edit-mode/persistence context.
+ * @see {@link WidgetConfig} for the registry entry derived from these props.
+ */
 export interface DashboardCardProps {
-  // Identity
+  /** Stable, unique widget identifier. Used as the store key, DnD id, and persistence key — must be constant across renders. */
   id: string;
+  /**
+   * Free-form widget category (e.g. `"chart"`, `"kpi"`). Surfaced on the DOM as
+   * `data-widget-type` and stored on the {@link WidgetConfig}. Purely descriptive; no behaviour attached.
+   * @default "custom"
+   */
   type?: string;
+  /** Human-readable title shown in the card toolbar/header. */
   title?: string;
 
-  // Features (all optional, default true where sensible)
+  /**
+   * Whether the card can be dragged to reposition it in edit mode. Alias: `draggable`.
+   * Dragging is only ever active in edit mode regardless of this flag.
+   * @default true
+   */
   drag?: boolean;
+  /**
+   * Whether the card shows corner resize grips in edit mode. Alias: `resizable`.
+   * @default true
+   * @see {@link DashboardCardProps.resizeHandles} to choose which grips appear.
+   */
   resize?: boolean;
+  /**
+   * Whether the card exposes a delete affordance in edit mode. Alias: `deletable`.
+   * Removes the widget from the store (and fires {@link DashboardCardProps.onDelete}) when used.
+   * @default true
+   */
   delete?: boolean;
+  /**
+   * Controls the settings gear. Alias: `showSettings`.
+   * - `true` (default) renders the built-in settings panel.
+   * - `false` hides settings entirely.
+   * - a `ReactNode` renders that node as a fully custom settings panel instead of the default one.
+   * @default true
+   * @see {@link DashboardCardProps.settingsVisibility} for when the gear is shown.
+   * @see {@link SettingsPanel} for the built-in panel.
+   */
   settings?: boolean | React.ReactNode;
+  /**
+   * Whether to show the responsive view-cycler button in the toolbar, letting the user
+   * step through the breakpoint variants defined in {@link DashboardCardProps.viewBreakpoints}.
+   * @default false
+   */
   viewCycler?: boolean;
 
-  // Resize handles to show (default: ["bottomRight"])
+  /**
+   * Which resize grips to render, in `{@link ResizeHandle}` terms.
+   *
+   * Defaults to BOTH bottom corners `["bottomRight", "bottomLeft"]` (not just bottom-right).
+   * WHY: a widget sitting flush against the container's right edge has no room to drag its
+   * bottom-right grip outward, so it would be effectively un-resizable; offering the bottom-left
+   * grip (which grows the widget leftward) guarantees there is always a reachable grip no matter
+   * where the card sits. Only the four corner handles are rendered; edge aliases map to a corner.
+   * An explicit value always overrides the default.
+   * @default ["bottomRight", "bottomLeft"]
+   */
   resizeHandles?: ResizeHandle[];
 
-  // Auto-detect resize directions based on widget position (default: false)
+  /**
+   * Reserved flag to auto-pick resize directions from the widget's position. Not currently
+   * consulted by the render path (the two-bottom-corner default covers the edge-anchored case).
+   * @default false
+   */
   autoResizeDirections?: boolean;
 
-  // Settings Panel
+  /** Custom settings panel node (or `false` to omit). Overlaps with the `ReactNode` form of {@link DashboardCardProps.settings}. */
   settingsPanel?: React.ReactNode | boolean;
-  /** When to show the settings gear icon. "edit-mode" = only while editing (default), "always" = always visible */
+  /**
+   * When to show the settings gear icon.
+   * - `"edit-mode"` — only visible while the dashboard is in edit mode.
+   * - `"always"` — visible in both view and edit mode.
+   * @default "edit-mode"
+   */
   settingsVisibility?: "edit-mode" | "always";
-  /** Callback fired whenever a setting is changed */
+  /**
+   * Fired whenever the user changes a value in the settings panel.
+   * @param settings the widget's full, updated {@link WidgetSettings} object.
+   */
   onSettingsChange?: (settings: WidgetSettings) => void;
 
-  // Responsive Views
+  /**
+   * Map of responsive content variants keyed by container-width breakpoint. When set, the card
+   * swaps its children based on its own measured width (via {@link useResponsive}); with
+   * {@link DashboardCardProps.viewCycler} the user can also step through variants manually.
+   * @see {@link ViewBreakpoints}
+   */
   viewBreakpoints?: ViewBreakpoints;
 
-  // Size & Position (only used in edit mode)
+  /** Initial size, applied only in edit mode / before a stored size exists. Falls back to `{ width: 300, height: 200 }`. */
   defaultSize?: Size;
+  /**
+   * Initial (home) position. An explicit value — even `{ x: 0, y: 0 }` — is treated as intentional
+   * and suppresses the auto-grid fallback. Also acts as the anchor that {@link DashboardCardProps.viewSizes}
+   * cycling returns to.
+   */
   defaultPosition?: Position;
 
-  // Styling
+  /**
+   * Preset sizes the card can snap through. When set, double-clicking the card (or pressing the
+   * toolbar cycle button) advances to the next size with a smooth animated resize — turning
+   * width-driven responsive views into a single click.
+   *
+   * Cycling is anchored to the card's HOME position ({@link DashboardCardProps.defaultPosition}, or
+   * the current stored position if none): when a larger preset would overflow the container it
+   * shifts left/up only as far as needed to stay fully inside, and when it shrinks back the widget
+   * returns to its original spot without drift or overlap. The current preset is matched by width
+   * (within a 12px tolerance) and the next index wraps around.
+   * @see {@link DashboardCardProps.snapOnDoubleClick}
+   */
+  viewSizes?: Size[];
+  /**
+   * Enable the double-click-to-cycle gesture. Only has effect when {@link DashboardCardProps.viewSizes}
+   * is provided. The toolbar cycle button works regardless of this flag.
+   * @default true
+   */
+  snapOnDoubleClick?: boolean;
+
+  /** Extra class names appended to the card's root element. */
   className?: string;
+  /** Inline styles merged into the card's computed style (positioning/size styles still win). */
   style?: React.CSSProperties;
 
-  // Events
+  /** Called after the widget is removed via the delete affordance (fires in addition to store removal). */
   onDelete?: () => void;
 
-  // Content
+  /** Widget content. In view mode this is rendered directly; with {@link DashboardCardProps.viewBreakpoints} it is the `initial` variant. */
   children?: React.ReactNode;
 }
 
@@ -86,6 +202,42 @@ export interface DashboardCardProps {
 // DashboardCard Component
 // ============================================================
 
+/**
+ * A single draggable, resizable widget container for a {@link Dashboard}.
+ *
+ * Wrap any content in a `DashboardCard` and it becomes a movable dashboard tile: in edit mode
+ * the user can drag it, resize it from the corner grips, delete it, and open its settings panel;
+ * in view mode it renders as a positioned, read-only card. Positions and sizes are kept in the
+ * shared {@link useDashboardStore} and (when the parent `Dashboard` has a `persistenceKey`)
+ * survive reloads and navigation. Must be rendered inside a {@link Dashboard}, which provides the
+ * edit-mode/registration context.
+ *
+ * Extra capabilities:
+ * - `viewSizes` + double-click (or the toolbar cycle button) snap the card through preset sizes,
+ *   anchored to its home position so it never drifts (see {@link DashboardCardProps.viewSizes}).
+ * - `viewBreakpoints` swap the content responsively based on the card's own width.
+ * - Off-screen cards skip rendering their content via an IntersectionObserver for performance.
+ *
+ * Returns `null` until the widget has registered itself in the store (one render), then the card.
+ *
+ * @param props - see {@link DashboardCardProps}.
+ * @returns The rendered card, or `null` on the first render before registration completes.
+ *
+ * @example
+ * ```tsx
+ * import { Dashboard, DashboardCard, KPIWidget } from "@dashcraft/core";
+ *
+ * <Dashboard persistenceKey="ops" defaultEditMode>
+ *   <DashboardCard id="uptime" title="Uptime" defaultPosition={{ x: 0, y: 0 }}>
+ *     <KPIWidget value={99.98} format="percent" />
+ *   </DashboardCard>
+ * </Dashboard>
+ * ```
+ *
+ * @see {@link DashboardCardProps} for every prop.
+ * @see {@link Dashboard} for the required provider.
+ * @see {@link useDashboardStore} for reading/writing widget position, size, and settings.
+ */
 export const DashboardCard = React.memo(function DashboardCard({
   id,
   type = "custom",
@@ -97,10 +249,14 @@ export const DashboardCard = React.memo(function DashboardCard({
   settingsVisibility = "edit-mode",
   onSettingsChange,
   viewCycler: showViewCycler = false,
-  resizeHandles = ["bottomRight"],
+  // Left undefined by default so effectiveResizeHandles picks the sensible
+  // default (both bottom corners); an explicit prop always wins.
+  resizeHandles,
   viewBreakpoints,
   defaultSize,
   defaultPosition,
+  viewSizes,
+  snapOnDoubleClick = true,
   className,
   style,
   onDelete,
@@ -288,6 +444,44 @@ export const DashboardCard = React.memo(function DashboardCard({
   const handleClick = useCallback(() => {
     bringToFront(id);
   }, [id, bringToFront]);
+
+  // Advance to the next preset size (wraps around). The animated resize is
+  // driven by the width/height CSS transition on the card.
+  const cycleViewSize = useCallback(() => {
+    if (!viewSizes || viewSizes.length === 0) return;
+    const cur = widgetState?.size ?? defaultSize;
+    let idx = -1;
+    if (cur && typeof cur.width === "number") {
+      idx = viewSizes.findIndex((s) => Math.abs(s.width - (cur.width as number)) < 12);
+    }
+    const next = viewSizes[(idx + 1) % viewSizes.length];
+    if (!next) return;
+    bringToFront(id);
+    storeUpdateWidgetSize(id, next);
+
+    // Smart expansion anchored to the widget's HOME (default) position:
+    // when growing, shift left/up only as needed to stay fully inside the
+    // container; when shrinking back, the smaller size fits at home so the
+    // widget returns to its original spot (no drift/overlap). Animated by the
+    // card's transform transition.
+    const home = defaultPosition ?? widgetState?.position;
+    const container = (containerRef as React.MutableRefObject<HTMLDivElement | null>).current?.parentElement;
+    if (container && home) {
+      const bounds = container.getBoundingClientRect();
+      let nextX = home.x;
+      let nextY = home.y;
+      if (typeof next.width === "number") nextX = Math.min(home.x, Math.max(0, bounds.width - next.width));
+      if (typeof next.height === "number") nextY = Math.min(home.y, Math.max(0, bounds.height - next.height));
+      const cur = widgetState?.position;
+      if (!cur || cur.x !== nextX || cur.y !== nextY) {
+        useDashboardStore.getState().updateWidgetPosition(id, { x: nextX, y: nextY });
+      }
+    }
+  }, [viewSizes, widgetState?.size, widgetState?.position, defaultSize, defaultPosition, id, bringToFront, storeUpdateWidgetSize]);
+
+  const handleDoubleClick = useCallback(() => {
+    if (viewSizes && snapOnDoubleClick) cycleViewSize();
+  }, [viewSizes, snapOnDoubleClick, cycleViewSize]);
 
   const handleDelete = useCallback(() => {
     removeWidget(id);
@@ -508,7 +702,7 @@ export const DashboardCard = React.memo(function DashboardCard({
       transform: `translate3d(${baseX + dragX}px, ${baseY + dragY}px, 0)`,
       willChange: isDragging || isResizing ? "transform, width, height" : "auto",
       opacity: isDragging ? 0.92 : settingsOpacity,
-      transition: shouldTransition ? "transform 0.2s ease, opacity 0.2s ease, box-shadow 0.15s ease" : "none",
+      transition: shouldTransition ? "transform 0.2s ease, width 0.32s cubic-bezier(0.4,0,0.2,1), height 0.32s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease, box-shadow 0.15s ease" : "none",
       boxShadow: isDragging
         ? "0 12px 35px rgba(0,0,0,0.25), 0 0 0 2px rgba(99,102,241,0.8)"
         : "0 0 0 2px rgba(99,102,241,0.45)",
@@ -561,13 +755,18 @@ export const DashboardCard = React.memo(function DashboardCard({
   // ==========================================================
 
   const effectiveResizeHandles = useMemo<ResizeHandle[]>(() => {
-    // Always use the explicitly provided resizeHandles
+    // An explicit prop always wins.
     if (resizeHandles && resizeHandles.length > 0) {
       return resizeHandles;
     }
 
-    // Default fallback
-    return ["bottomRight"];
+    // Default: both bottom corners. A widget flush against the container's
+    // right edge cannot drag its bottom-right grip outward, so the bottom-left
+    // grip (which grows the widget leftward) is the one that works for it.
+    // Offering both means there is always a reachable grip regardless of where
+    // the widget sits, and — unlike flipping a single grip by edge proximity —
+    // the active grip never disappears mid-resize.
+    return ["bottomRight", "bottomLeft"];
   }, [resizeHandles]);
 
   // ==========================================================
@@ -597,118 +796,33 @@ export const DashboardCard = React.memo(function DashboardCard({
       className={`dashcraft-card relative p-1 rounded-lg ${className ?? ""}`}
       style={cardStyle}
       onClick={handleClick}
+      onDoubleClick={handleDoubleClick}
+      title={viewSizes && snapOnDoubleClick ? "Double-click to change view size" : undefined}
       data-widget-id={id}
       data-widget-type={type}
     >
-      {/* ── Edit-mode toolbar ── */}
-      {isEditMode && (
-        <div className="absolute inset-x-0 top-0 h-7 z-10 flex items-stretch
-          bg-slate-100/90 border-b border-slate-200/70 rounded-t-lg overflow-hidden">
-
-          {/* Settings gear */}
-          {showSettings && widgetState && (
-            <SettingsPanel
-              id={id}
-              settings={widgetState.settings}
-              {...(customSettingsPanel !== undefined && { customContent: customSettingsPanel })}
-              {...(onSettingsChange !== undefined && { onSettingsChange })}
-              trigger={
-                <button
-                  type="button"
-                  className="w-7 shrink-0 flex items-center justify-center
-                    text-slate-500 hover:text-slate-800
-                    hover:bg-slate-200/80 border-r border-slate-200/70
-                    transition-colors cursor-pointer"
-                  title="Widget settings"
-                  aria-label="Widget settings"
-                >
-                  <Settings size={12} />
-                </button>
-              }
-            />
-          )}
-
-          {/* View cycler — only when widget has breakpoints */}
-          {showViewCycler && viewBreakpoints && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                const nextIdx = ((viewCyclerIndex ?? 0) + 1) % viewCyclerKeys.length;
-                setViewCyclerIndex(nextIdx);
-              }}
-              className="w-8 shrink-0 flex items-center justify-center gap-0.5
-                text-indigo-500 hover:text-indigo-700
-                hover:bg-indigo-50/80 border-r border-slate-200/70
-                text-[10px] font-bold tracking-wide
-                transition-colors cursor-pointer"
-              title={`Cycle view (${viewCyclerLabel})`}
-              aria-label="Cycle view"
-            >
-              {viewCyclerLabel}
-              <ChevronRight size={9} />
-            </button>
-          )}
-
-          {/* Drag grip — takes remaining space */}
-          {draggable ? (
-            <button
-              type="button"
-              className="flex-1 flex items-center justify-center
-                text-slate-400 hover:text-slate-600
-                cursor-grab active:cursor-grabbing
-                transition-colors select-none"
-              aria-label="Drag to move"
-              {...(attributes ?? {})}
-              {...(listeners ?? {})}
-            >
-              <GripHorizontal size={13} />
-            </button>
-          ) : (
-            <div className="flex-1" />
-          )}
-
-          {/* Delete button */}
-          {deletable && (
-            <button
-              type="button"
-              onClick={handleDelete}
-              className="w-7 shrink-0 flex items-center justify-center
-                text-red-400 hover:text-red-600
-                hover:bg-red-50/80 border-l border-slate-200/70
-                transition-colors cursor-pointer"
-              title="Delete widget"
-              aria-label="Delete widget"
-            >
-              <Trash2 size={12} />
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* Settings gear in view mode when settingsVisibility="always" */}
-      {!isEditMode && showSettings && settingsVisibility === "always" && widgetState && (
-        <SettingsPanel
-          id={id}
-          settings={widgetState.settings}
-          {...(customSettingsPanel !== undefined && { customContent: customSettingsPanel })}
-          {...(onSettingsChange !== undefined && { onSettingsChange })}
-          trigger={
-            <button
-              type="button"
-              className="widget-action-btn absolute top-1 left-1
-                flex items-center justify-center w-6 h-6 rounded
-                bg-slate-100 border border-slate-300 text-slate-600
-                hover:text-slate-800 hover:bg-slate-200 hover:border-slate-400
-                shadow-sm transition-all duration-150 cursor-pointer pointer-events-auto z-10"
-              title="Widget settings"
-              aria-label="Widget settings"
-            >
-              <Settings size={12} />
-            </button>
-          }
-        />
-      )}
+      <DashboardCardToolbar
+        isEditMode={isEditMode}
+        id={id}
+        widgetState={widgetState}
+        showSettings={showSettings}
+        settingsVisibility={settingsVisibility}
+        customSettingsPanel={customSettingsPanel}
+        onSettingsChange={onSettingsChange}
+        draggable={draggable}
+        deletable={deletable}
+        onDelete={handleDelete}
+        dragAttributes={attributes as unknown as Record<string, unknown> | undefined}
+        dragListeners={listeners as unknown as Record<string, unknown> | undefined}
+        showViewCycler={showViewCycler}
+        viewBreakpoints={viewBreakpoints}
+        viewCyclerIndex={viewCyclerIndex}
+        setViewCyclerIndex={setViewCyclerIndex}
+        viewCyclerKeys={viewCyclerKeys}
+        viewCyclerLabel={viewCyclerLabel}
+        canCycleSize={!!viewSizes && viewSizes.length > 1}
+        onCycleSize={cycleViewSize}
+      />
 
       {/* Content — lightweight placeholder when off-screen */}
       <div className={`dashcraft-card-content flex flex-col flex-1 min-w-0 min-h-0 overflow-hidden rounded-lg p-3 pb-6 ${isEditMode ? "pt-7" : "pt-3"}`}>

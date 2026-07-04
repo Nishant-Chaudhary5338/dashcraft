@@ -25,7 +25,7 @@ const NAV = [
     group: "Hooks",
     links: [
       { href: "/docs/hooks#useDashboard", label: "useDashboard" },
-      { href: "/docs/hooks#useWidgetData", label: "useWidgetData" },
+      { href: "/docs/hooks#usePersistedState", label: "usePersistedState" },
       { href: "/docs/hooks#useWidgetEvents", label: "useWidgetEvents" },
       { href: "/docs/hooks#usePersistence", label: "usePersistence" },
       { href: "/docs/hooks#useDraggable", label: "useDraggable" },

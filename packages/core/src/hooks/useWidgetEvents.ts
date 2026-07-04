@@ -5,7 +5,11 @@ import { useEffect, useRef, useCallback } from "react";
 // ============================================================
 
 /**
- * Widget lifecycle events
+ * The set of widget lifecycle event names understood by the widget event
+ * bus. `"mount"` and `"unmount"` are emitted automatically by
+ * {@link useWidgetEvents}; the rest (`"resize"`, `"dataChange"`,
+ * `"focus"`, `"blur"`, `"error"`) are emitted manually via that hook's
+ * returned `emit` function, or via {@link getWidgetEventBus}.
  */
 export type WidgetEvent =
   | "mount"
@@ -17,22 +21,33 @@ export type WidgetEvent =
   | "error";
 
 /**
- * Event payload for widget events
+ * The payload delivered to every {@link WidgetEventListener}.
  */
 export interface WidgetEventPayload {
+  /** The widget the event originated from. */
   widgetId: string;
+  /** Which lifecycle event occurred. */
   eventType: WidgetEvent;
+  /** `Date.now()` at the moment the event was emitted. */
   timestamp: number;
+  /** Optional event-specific payload, e.g. the new data on `"dataChange"` or the error on `"error"`. */
   data?: unknown;
 }
 
 /**
- * Event listener callback type
+ * Callback invoked with a {@link WidgetEventPayload} whenever a subscribed
+ * widget event fires. Thrown errors are caught and logged by the event
+ * bus so one bad listener can't break others.
  */
 export type WidgetEventListener = (payload: WidgetEventPayload) => void;
 
 /**
- * Internal event bus for widget events
+ * Process-wide pub/sub bus for widget lifecycle events. A single
+ * singleton instance backs both {@link useWidgetEvents} (per-widget
+ * subscriptions) and {@link useWidgetEventsGlobal} (subscribe-to-all).
+ * Most consumers should use those hooks rather than this class directly;
+ * it's exposed via {@link getWidgetEventBus} for advanced cases like
+ * emitting events from outside React (e.g. a non-React data adapter).
  */
 class WidgetEventBus {
   private listeners = new Map<string, Set<WidgetEventListener>>();
@@ -121,12 +136,24 @@ class WidgetEventBus {
 const eventBus = new WidgetEventBus();
 
 /**
- * Hook to subscribe to widget lifecycle events.
- * Provides emit function to trigger events and handles cleanup.
+ * Subscribes a widget to its own lifecycle events and provides an `emit`
+ * function to trigger custom ones.
  *
- * @param widgetId - The widget ID to subscribe events for
- * @param handlers - Object with event handlers for specific events
- * @returns Object with emit function for triggering events
+ * Automatically emits `"mount"` when the component using this hook mounts
+ * and `"unmount"` when it unmounts (or when `widgetId` changes), and
+ * unsubscribes cleanly on cleanup. Use this inside a widget's own
+ * component to react to its lifecycle, or to broadcast custom events
+ * (e.g. `"dataChange"`) that other parts of the dashboard can observe via
+ * {@link useWidgetEventsGlobal}.
+ *
+ * @param widgetId - The widget ID to scope subscriptions and emitted
+ * events to. Changing this unsubscribes from the old id and subscribes
+ * to the new one.
+ * @param handlers - Optional map of event name to handler; only events
+ * with a handler present are acted on. Re-renders don't require a
+ * memoized object — the latest `handlers` is always used via a ref.
+ * @returns An object with `emit(eventType, data?)` to fire an event for
+ * this widget.
  *
  * @example
  * ```tsx
@@ -139,6 +166,9 @@ const eventBus = new WidgetEventBus();
  * // Emit a custom event
  * emit('dataChange', { newValue: data });
  * ```
+ *
+ * @see {@link useWidgetEventsGlobal} to listen to every widget's events at once.
+ * @see {@link getWidgetEventBus} for direct bus access outside of React.
  */
 export function useWidgetEvents(
   widgetId: string,
@@ -197,17 +227,31 @@ export function useWidgetEvents(
 }
 
 /**
- * Hook to subscribe to all widget events (global listener).
- * Useful for analytics, logging, or debugging.
+ * Subscribes to every widget's lifecycle events across the whole
+ * dashboard, regardless of widget id.
  *
- * @param listener - Callback function for all widget events
+ * Useful for analytics, centralized logging, or a debug overlay that
+ * needs visibility into all widgets at once, without each widget having
+ * to forward its events manually.
+ *
+ * @param listener - Callback invoked for every event emitted by any
+ * widget. Re-renders don't require memoizing `listener` — the latest
+ * value is always used via a ref, and the subscription itself is only
+ * set up once (on mount).
  *
  * @example
  * ```tsx
- * useWidgetEventsGlobal((payload) => {
- *   console.log(`[${payload.eventType}] Widget ${payload.widgetId}`, payload.data);
- * });
+ * import { useWidgetEventsGlobal } from "@dashcraft/core";
+ *
+ * function DashboardDebugPanel() {
+ *   useWidgetEventsGlobal((payload) => {
+ *     console.log(`[${payload.eventType}] Widget ${payload.widgetId}`, payload.data);
+ *   });
+ *   return null;
+ * }
  * ```
+ *
+ * @see {@link useWidgetEvents} to scope subscriptions to a single widget.
  */
 export function useWidgetEventsGlobal(listener: WidgetEventListener): void {
   const listenerRef = useRef(listener);
@@ -226,8 +270,29 @@ export function useWidgetEventsGlobal(listener: WidgetEventListener): void {
 }
 
 /**
- * Get the event bus instance for direct access (advanced use cases).
- * Prefer using the hooks for most scenarios.
+ * Returns the singleton widget event bus for direct, non-React access —
+ * e.g. emitting an `"error"` event from a plain-JS data adapter, or
+ * subscribing from code that runs outside a component's lifecycle. Prefer
+ * {@link useWidgetEvents} or {@link useWidgetEventsGlobal} inside React
+ * components, since they handle subscribe/unsubscribe cleanup for you.
+ *
+ * @returns The process-wide event bus instance.
+ *
+ * @example
+ * ```tsx
+ * import { getWidgetEventBus } from "@dashcraft/core";
+ *
+ * // From outside a React component, e.g. a websocket handler:
+ * getWidgetEventBus().emit({
+ *   widgetId: "sales-chart",
+ *   eventType: "dataChange",
+ *   timestamp: Date.now(),
+ *   data: newDataset,
+ * });
+ * ```
+ *
+ * @see {@link useWidgetEvents}
+ * @see {@link useWidgetEventsGlobal}
  */
 export function getWidgetEventBus(): WidgetEventBus {
   return eventBus;

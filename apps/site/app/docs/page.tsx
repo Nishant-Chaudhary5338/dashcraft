@@ -24,8 +24,8 @@ export default function DocsPage() {
       title: "Hooks",
       links: [
         { href: "/docs/hooks#useDashboard", label: "useDashboard", desc: "Access dashboard state and edit mode" },
-        { href: "/docs/hooks#useWidgetData", label: "useWidgetData", desc: "Subscribe to widget data" },
-        { href: "/docs/hooks#usePersistence", label: "usePersistence", desc: "Manual layout persistence" },
+        { href: "/docs/hooks#useWidgetEvents", label: "useWidgetEvents", desc: "Subscribe to widget lifecycle events" },
+        { href: "/docs/hooks#usePersistence", label: "usePersistence", desc: "General-purpose persisted state" },
       ],
     },
     {

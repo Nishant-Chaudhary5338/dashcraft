@@ -62,7 +62,7 @@ import '@dashcraft/core/styles.css'`} lang="tsx" />
       </Step>
 
       <Step n={4} title="Build your first dashboard">
-        <Code code={`import { Dashboard, DashboardCard, KPIWidget, RechartsWidget } from '@dashcraft/core'
+        <Code code={`import { Dashboard, KPIWidget, RechartsWidget } from '@dashcraft/core'
 import '@dashcraft/core/styles.css'
 
 const salesData = [
@@ -73,33 +73,27 @@ const salesData = [
 
 export function MyDashboard() {
   return (
-    <Dashboard id="my-dashboard" persist="my-dashboard-v1">
-      <DashboardCard
+    <Dashboard persistenceKey="my-dashboard-v1" autoSave>
+      <KPIWidget
         id="revenue"
-        drag resize settings
-        style={{ gridColumn: '1 / span 3', gridRow: '1 / span 2' }}
-      >
-        <KPIWidget
-          title="Total Revenue"
-          value={46200}
-          format="currency"
-          previousValue={38000}
-        />
-      </DashboardCard>
+        label="Total Revenue"
+        value={46200}
+        format="currency"
+        previousValue={38000}
+        defaultPosition={{ x: 0, y: 0 }}
+        defaultSize={{ width: 280, height: 180 }}
+      />
 
-      <DashboardCard
+      <RechartsWidget
         id="sales-chart"
-        drag resize settings delete
-        style={{ gridColumn: '4 / span 9', gridRow: '1 / span 4' }}
-      >
-        <RechartsWidget
-          title="Monthly Revenue"
-          chartType="bar"
-          data={salesData}
-          series={[{ key: 'revenue', name: 'Revenue', color: '#6366f1' }]}
-          xAxisKey="month"
-        />
-      </DashboardCard>
+        title="Monthly Revenue"
+        chartType="bar"
+        data={salesData}
+        series={[{ dataKey: 'revenue', name: 'Revenue', color: '#6366f1' }]}
+        xAxisKey="month"
+        defaultPosition={{ x: 300, y: 0 }}
+        defaultSize={{ width: 640, height: 320 }}
+      />
     </Dashboard>
   )
 }`} lang="tsx" />

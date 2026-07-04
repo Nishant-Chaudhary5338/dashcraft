@@ -1,10 +1,12 @@
 {
-  "name": "@dashcraft/mcp-codegen",
+  "name": "dashcraft-mcp-codegen",
   "version": "0.1.0",
-  "description": "MCP server — convert dashboard images to @dashcraft/core React code",
+  "description": "MCP server — convert dashboard images to dashcraft-core React code",
   "type": "module",
   "license": "MIT",
-  "bin": { "dashcraft-codegen": "./build/index.js" },
+  "bin": {
+    "dashcraft-codegen": "./build/index.js"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
@@ -20,5 +22,24 @@
     "@types/node": "^22.0.0",
     "tsx": "^4.19.0",
     "typescript": "~5.7.0"
-  }
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "dashboard",
+    "react-dashboard",
+    "codegen",
+    "code-generation",
+    "screenshot-to-code",
+    "image-to-code",
+    "screenshot-to-dashboard",
+    "ai-codegen",
+    "claude",
+    "cursor",
+    "dashcraft",
+    "dashcraft-core",
+    "ai-native",
+    "dashboard-generator"
+  ]
 }

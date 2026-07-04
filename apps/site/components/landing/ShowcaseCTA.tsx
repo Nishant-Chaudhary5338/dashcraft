@@ -23,7 +23,7 @@ export function ShowcaseCTA() {
           </h2>
           <p style={{ color: "var(--text-secondary)", maxWidth: 540, margin: "16px auto 0", lineHeight: 1.7 }}>
             Three production-grade dashboards built entirely with{" "}
-            <code style={{ fontFamily: "var(--font-mono)", color: "var(--accent)", fontSize: "0.9em" }}>@dashcraft/core</code>.
+            <code style={{ fontFamily: "var(--font-mono)", color: "var(--accent)", fontSize: "0.9em" }}>dashcraft-core</code>.
             Drag, resize, delete widgets — then download the code.
           </p>
         </div>

@@ -5,14 +5,33 @@ import { useDashboardContext } from "../Dashboard/Dashboard.context";
 // DashboardCardHeader Props
 // ============================================================
 
+/** Props for {@link DashboardCardHeader}. */
 export interface DashboardCardHeaderProps {
+  /** Id of the widget this header belongs to; used when deleting via the header's delete button. */
   id: string;
+  /** Title text shown on the left of the header. When absent and not in edit mode, the header renders nothing. */
   title?: string;
-  /** @deprecated use `delete` */
+  /**
+   * Whether the delete button is shown.
+   * @deprecated use `delete` instead; when both are set `deletable` wins for backwards-compat.
+   */
   deletable?: boolean;
+  /**
+   * Whether the delete button is shown (canonical prop; superseded by `deletable` only if that is also set).
+   * @default true
+   */
   delete?: boolean;
+  /**
+   * Whether the settings button is shown in edit mode.
+   * @default true
+   */
   settings?: boolean;
+  /**
+   * Whether the view-cycler button is shown in edit mode.
+   * @default false
+   */
   viewCycler?: boolean;
+  /** Called before the widget is removed when the header's delete button is clicked. */
   onDelete?: () => void;
 }
 
@@ -20,6 +39,26 @@ export interface DashboardCardHeaderProps {
 // DashboardCardHeader Component
 // ============================================================
 
+/**
+ * A title bar with edit-mode action buttons (view-cycler, settings, delete) for a widget card.
+ *
+ * An optional standalone header you can render at the top of custom widget content; the built-in
+ * {@link DashboardCard} toolbar covers most cases, so reach for this only when composing bespoke
+ * card chrome. Must be used within a {@link Dashboard}. Renders `null` in view mode when no `title`
+ * is provided (nothing to show); action buttons only appear in edit mode.
+ *
+ * @param props - see {@link DashboardCardHeaderProps}.
+ * @returns The header element, or `null` when there is nothing to display.
+ *
+ * @example
+ * ```tsx
+ * import { DashboardCardHeader } from "@dashcraft/core";
+ *
+ * <DashboardCardHeader id="sales" title="Sales" delete onDelete={() => console.log("removed")} />
+ * ```
+ *
+ * @see {@link DashboardCard}
+ */
 export const DashboardCardHeader = React.memo(function DashboardCardHeader({
   id,
   title,

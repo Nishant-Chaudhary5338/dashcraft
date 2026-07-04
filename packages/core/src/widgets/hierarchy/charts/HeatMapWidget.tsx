@@ -5,7 +5,14 @@ import type { HeatmapRowData, HierarchyChartComponentProps } from "../hierarchy.
 // HeatMapWidget — dependency-free CSS-grid heatmap
 // ============================================================
 
-/** Parse "#rrggbb" into [r,g,b]. Falls back to the brand indigo. */
+/**
+ * Parses a `"#rrggbb"` (optionally without `#`) hex color into an `[r, g, b]`
+ * tuple for use in an `rgba()` string. Not exported — internal to
+ * {@link HeatMapWidget}'s cell-tinting logic.
+ *
+ * @param hex - Hex color string to parse.
+ * @returns `[r, g, b]` byte tuple, or `[99, 102, 241]` (brand indigo) if `hex` doesn't match the expected pattern.
+ */
 function hexToRgb(hex: string): [number, number, number] {
   const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
   if (!m) return [99, 102, 241];
@@ -13,6 +20,32 @@ function hexToRgb(hex: string): [number, number, number] {
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 
+/**
+ * Dependency-free CSS-grid heatmap. Columns are derived from the union of
+ * every row's `data[].x` values (first-seen order); cell background opacity
+ * is scaled linearly between the dataset's min and max `y` value (0.12–1.0),
+ * tinted with `colors[0]` (or the default indigo `#6366f1` if omitted or
+ * unparseable). `animate` and `margin` are not applicable to this chart and
+ * are ignored. Used internally by {@link HierarchyWidget} when `chartType="heatmap"`.
+ *
+ * @param props - {@link HierarchyChartComponentProps} with `data` as {@link HeatmapRowData}`[]` (`animate`/`margin` accepted but unused).
+ * @returns A scrollable CSS-grid heatmap (no external chart library).
+ *
+ * @example
+ * ```tsx
+ * import { HierarchyWidget } from "@dashcraft/core";
+ *
+ * <HierarchyWidget
+ *   chartType="heatmap"
+ *   id="usage"
+ *   title="Usage by Hour"
+ *   data={[{ id: "Mon", data: [{ x: "9am", y: 12 }] }]}
+ *   colors={["#22c55e"]}
+ * />
+ * ```
+ *
+ * @see {@link HierarchyWidget}
+ */
 export const HeatMapWidget = React.memo(function HeatMapWidget({
   data,
   colors,

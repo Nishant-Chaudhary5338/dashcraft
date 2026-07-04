@@ -15,6 +15,30 @@ import type { ChartComponentProps } from "../recharts.types";
 // RadarChartWidget Component
 // ============================================================
 
+/**
+ * Renders a recharts `<RadarChart>` — one filled `<Radar>` polygon per
+ * series, with `xAxisKey` driving the angle-axis categories. `showGrid` is
+ * not applicable (the polar grid always renders) and is ignored. Used
+ * internally by {@link RechartsWidget} when `chartType="radar"`.
+ *
+ * @param props - {@link ChartComponentProps} (`showGrid` accepted but unused).
+ * @returns A `ResponsiveContainer`-wrapped recharts radar chart.
+ *
+ * @example
+ * ```tsx
+ * import { RechartsWidget } from "@dashcraft/core";
+ *
+ * <RechartsWidget
+ *   chartType="radar"
+ *   id="skills"
+ *   title="Skill Coverage"
+ *   data={[{ name: "Speed", a: 80 }, { name: "Accuracy", a: 65 }]}
+ *   series={[{ dataKey: "a", name: "Team A", color: "#8b5cf6" }]}
+ * />
+ * ```
+ *
+ * @see {@link RechartsWidget}
+ */
 export const RadarChartWidget = React.memo(function RadarChartWidget({
   data,
   series,

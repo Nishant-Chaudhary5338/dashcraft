@@ -20,89 +20,135 @@ export default function EditModePage() {
 
       <h2 className="docs-h2" id="toggle">Toggling edit mode</h2>
       <p className="docs-p">
-        Pass <code>editMode</code> to <code>Dashboard</code>. When true, all cards with
-        <code>drag</code> or <code>resize</code> props become interactive.
+        There is no <code>editMode</code> prop. Set the initial state with <code>defaultEditMode</code>,
+        then flip it at runtime with the <code>useDashboard</code> hook (from a component rendered inside
+        the <code>Dashboard</code>) or <code>useDashboardStore</code> (from anywhere). When edit mode is on,
+        every card with <code>drag</code> or <code>resize</code> enabled becomes interactive.
       </p>
-      <Code code={`function App() {
-  const [editing, setEditing] = useState(false)
+      <Code code={`import { Dashboard, KPIWidget, useDashboard } from '@dashcraft/core'
 
+function EditToggle() {
+  const { isEditMode, toggleEditMode } = useDashboard()
   return (
-    <>
-      <button onClick={() => setEditing(v => !v)}>
-        {editing ? '✓ Done' : '⊞ Edit layout'}
-      </button>
+    <button onClick={toggleEditMode}>
+      {isEditMode ? '✓ Done' : '⊞ Edit layout'}
+    </button>
+  )
+}
 
-      <Dashboard id="main" editMode={editing} persist="main-v1">
-        <DashboardCard id="card-1" drag resize settings>
-          <KPIWidget title="Revenue" value={124500} format="currency" />
-        </DashboardCard>
-      </Dashboard>
-    </>
+function App() {
+  return (
+    <Dashboard persistenceKey="main-v1" autoSave>
+      <EditToggle />
+      <KPIWidget
+        id="card-1"
+        label="Revenue"
+        value={124500}
+        format="currency"
+        defaultPosition={{ x: 0, y: 40 }}
+        defaultSize={{ width: 280, height: 180 }}
+      />
+    </Dashboard>
   )
 }`} />
+      <div className="docs-callout">
+        <strong>Leaving edit mode saves.</strong> When <code>persistenceKey</code> is set, the layout is
+        saved to localStorage as users exit edit mode (and on unmount). Turn on <code>autoSave</code> to
+        also save on every change.
+      </div>
 
-      <h2 className="docs-h2" id="hook">Using the hook</h2>
+      <h2 className="docs-h2" id="toggle-outside">Toggling from outside the tree</h2>
       <p className="docs-p">
-        Access edit mode state from anywhere in the component tree with <code>useDashboard</code>:
+        <code>useDashboard</code> must run inside a <code>Dashboard</code>. To drive edit mode from a
+        toolbar that sits elsewhere, subscribe to the store directly:
       </p>
-      <Code code={`import { useDashboard } from '@dashcraft/core'
+      <Code code={`import { useDashboardStore, selectIsEditMode } from '@dashcraft/core'
 
-function DashboardToolbar() {
-  const { editMode, setEditMode } = useDashboard('main')
+function GlobalToolbar() {
+  const isEditMode = useDashboardStore(selectIsEditMode)
+  const toggleEditMode = useDashboardStore((s) => s.toggleEditMode)
 
   return (
-    <div className="toolbar">
-      <span>{editMode ? 'Drag cards to rearrange' : 'Click Edit to customize'}</span>
-      <button onClick={() => setEditMode(!editMode)}>
-        {editMode ? 'Done' : 'Edit'}
-      </button>
-    </div>
+    <button onClick={toggleEditMode}>
+      {isEditMode ? 'Drag cards to rearrange' : 'Click Edit to customize'}
+    </button>
   )
 }`} />
 
       <h2 className="docs-h2" id="per-card">Per-card control</h2>
       <p className="docs-p">
-        Each behaviour is independent per card. Mix and match — some cards draggable, others fixed:
+        Each behaviour is an independent boolean prop that <strong>defaults to <code>true</code></strong>.
+        To pin a card, opt each behaviour out explicitly:
       </p>
-      <Code code={`<Dashboard id="main" editMode={editing}>
-  {/* This card can be dragged and resized */}
-  <DashboardCard id="metrics" drag resize>
-    <KPIWidget ... />
-  </DashboardCard>
+      <Code code={`{/* Fully interactive — drag, resize, delete, settings all default on */}
+<KPIWidget id="metrics" label="Sessions" value={8412} />
 
-  {/* This card can only be deleted — it's pinned */}
-  <DashboardCard id="header" delete>
-    <Header />
-  </DashboardCard>
+{/* Draggable but not resizable or deletable */}
+<KPIWidget id="header-kpi" label="MRR" value={92000} resize={false} delete={false} />
 
-  {/* This card is completely static */}
-  <DashboardCard id="welcome">
-    <WelcomeMessage />
-  </DashboardCard>
-</Dashboard>`} />
+{/* Completely static — nothing moves */}
+<KPIWidget id="welcome" label="Welcome" value="Hi" drag={false} resize={false} delete={false} settings={false} />`} />
+
+      <h2 className="docs-h2" id="resize-handles">Resize handles</h2>
+      <p className="docs-p">
+        Resize grips render at the corners in edit mode. By default a card shows both{" "}
+        <em>bottom</em> corners — <code>{`["bottomRight", "bottomLeft"]`}</code>. That default exists so a
+        widget flush against the container&apos;s right edge (where the bottom-right grip has no room to
+        drag outward) always has a reachable grip: the bottom-left one grows it leftward. Override with
+        the <code>resizeHandles</code> prop when you want different corners:
+      </p>
+      <Code code={`{/* Default — both bottom corners, always reachable */}
+<DashboardCard id="a" defaultSize={{ width: 300, height: 200 }}>...</DashboardCard>
+
+{/* Only the bottom-right grip */}
+<DashboardCard id="b" resizeHandles={['bottomRight']} defaultSize={{ width: 300, height: 200 }}>...</DashboardCard>
+
+{/* All four corners */}
+<DashboardCard id="c" resizeHandles={['topLeft', 'topRight', 'bottomLeft', 'bottomRight']}>...</DashboardCard>`} />
+
+      <h2 className="docs-h2" id="view-sizes">Double-click to cycle sizes</h2>
+      <p className="docs-p">
+        Give a card a set of <code>viewSizes</code> and users can double-click it to snap through the
+        presets with a smooth animated resize — turning width-driven responsive layouts into a single
+        click. The resize is anchored to the card&apos;s home (default) position, so growing shifts it
+        only as far as needed to stay inside the canvas and shrinking returns it to its original spot.
+        The gesture is on by default; set <code>snapOnDoubleClick={`{false}`}</code> to disable it while
+        keeping the toolbar cycle button.
+      </p>
+      <Code code={`<DashboardCard
+  id="chart"
+  defaultPosition={{ x: 0, y: 0 }}
+  defaultSize={{ width: 320, height: 220 }}
+  viewSizes={[
+    { width: 320, height: 220 },  // compact
+    { width: 480, height: 300 },  // medium
+    { width: 720, height: 420 },  // expanded
+  ]}
+>
+  <RechartsWidget chartType="line" data={data} series={series} xAxisKey="day" />
+</DashboardCard>`} />
 
       <h2 className="docs-h2" id="settings">Settings panel</h2>
       <p className="docs-p">
-        The <code>settings</code> prop adds a gear icon. Wire it to your own panel:
+        The <code>settings</code> prop adds a gear icon (visible in edit mode by default — set{" "}
+        <code>settingsVisibility=&quot;always&quot;</code> to keep it on). Pass a ReactNode to{" "}
+        <code>settings</code> for a custom panel, and react to built-in changes with{" "}
+        <code>onSettingsChange</code>:
       </p>
-      <Code code={`import { useWidgetEvents } from '@dashcraft/core'
-
-function ChartCard({ id }: { id: string }) {
-  const [open, setOpen] = useState(false)
-
-  useWidgetEvents(id, {
-    onSettings: () => setOpen(true),
-  })
-
+      <Code code={`function ChartCard({ id }: { id: string }) {
   return (
-    <>
-      <RechartsWidget chartType="bar" data={data} series={series} xAxisKey="month" />
-      {open && (
-        <SettingsPanel onClose={() => setOpen(false)}>
-          <ChartSettingsForm />
-        </SettingsPanel>
-      )}
-    </>
+    <RechartsWidget
+      id={id}
+      chartType="bar"
+      data={data}
+      series={series}
+      xAxisKey="month"
+      settings
+      settingsVisibility="always"
+      onSettingsChange={(settings) => {
+        console.log('opacity, theme, highlight…', settings)
+      }}
+    />
   )
 }`} />
     </div>

@@ -36,7 +36,7 @@ export function ShowcaseClient() {
 
   const handlePresetSwitch = useCallback((key: PresetKey) => {
     startTransition(() => {
-      import("@dashcraft/core/store").then(({ useDashboardStore }) => {
+      import("dashcraft-core/store").then(({ useDashboardStore }) => {
         useDashboardStore.getState().resetLayout();
         setPreset(key);
         setDeletedIds(new Set());
@@ -51,7 +51,7 @@ export function ShowcaseClient() {
   }, []);
 
   const handleReset = useCallback(() => {
-    import("@dashcraft/core/store").then(({ useDashboardStore }) => {
+    import("dashcraft-core/store").then(({ useDashboardStore }) => {
       useDashboardStore.getState().resetLayout();
       setDeletedIds(new Set());
     });

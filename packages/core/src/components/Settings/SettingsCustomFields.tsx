@@ -7,9 +7,17 @@ import type { CustomFieldConfig } from "../../types";
 // Props
 // ============================================================
 
+/**
+ * Props for {@link SettingsCustomFields}.
+ */
 export interface SettingsCustomFieldsProps {
+  /** Map of field key → its {@link CustomFieldConfig} (type, label, and type-specific constraints like min/max/options).
+   * Keyed by the same field name used in `values` and passed back to `onChange`. */
   fields: Record<string, CustomFieldConfig>;
+  /** Current value for every settings key, including but not limited to custom fields — each field reads `values[key]`,
+   * falling back to `fields[key].default` when unset. */
   values: Record<string, unknown>;
+  /** Called with the field's key and its new value whenever any custom field control changes. */
   onChange: (key: string, value: unknown) => void;
 }
 
@@ -17,6 +25,30 @@ export interface SettingsCustomFieldsProps {
 // Component
 // ============================================================
 
+/**
+ * Renders a dynamic list of widget-specific settings controls driven entirely
+ * by a `fields` config map, so widget authors can add custom settings
+ * (numbers, sliders, colors, toggles, selects, free text) without writing
+ * dedicated Settings UI. Renders nothing when `fields` is empty.
+ *
+ * Each entry's `type` (see {@link CustomFieldConfig}) selects the control:
+ * `"text"` → text input, `"number"` → number input (respects `min`/`max`/`step`),
+ * `"boolean"` → switch, `"select"` → dropdown of `options`, `"color"` → native
+ * color input, `"slider"` → Radix slider (respects `min`/`max`/`step`).
+ *
+ * @example
+ * ```tsx
+ * import { SettingsCustomFields } from "@dashcraft/core";
+ *
+ * <SettingsCustomFields
+ *   fields={{ refreshLabel: { type: "text", label: "Refresh Label" } }}
+ *   values={{ refreshLabel: "Live" }}
+ *   onChange={(key, value) => updateSettings({ [key]: value })}
+ * />
+ * ```
+ *
+ * @see {@link SettingsPanel} for the container that composes this section.
+ */
 export const SettingsCustomFields = React.memo(
   function SettingsCustomFields({
     fields,
@@ -51,13 +83,26 @@ SettingsCustomFields.displayName = "SettingsCustomFields";
 // CustomFieldItem Component
 // ============================================================
 
+/**
+ * Props for the internal {@link CustomFieldItem} renderer (not exported —
+ * one is rendered per entry of {@link SettingsCustomFieldsProps.fields}).
+ */
 interface CustomFieldItemProps {
+  /** The settings key this field controls. */
   fieldKey: string;
+  /** Field configuration determining which control renders and its constraints. */
   config: CustomFieldConfig;
+  /** Current value for this field; falls back to `config.default` when `undefined`. */
   value: unknown;
+  /** Called with `(fieldKey, newValue)` when the rendered control changes. */
   onChange: (key: string, value: unknown) => void;
 }
 
+/**
+ * Renders a single labeled control for one custom field, chosen by
+ * `config.type`. Internal helper for {@link SettingsCustomFields} — not part
+ * of the public API.
+ */
 const CustomFieldItem = React.memo(function CustomFieldItem({
   fieldKey,
   config,

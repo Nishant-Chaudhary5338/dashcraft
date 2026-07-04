@@ -1,14 +1,14 @@
 ---
 name: Bug report
-about: Something isn't working correctly in @dashcraft/core or the site
+about: Something isn't working correctly in dashcraft-core or the site
 title: '[bug] '
 labels: bug
 assignees: ''
 ---
 
 **Package**
-- [ ] `@dashcraft/core`
-- [ ] `@dashcraft/mcp-codegen`
+- [ ] `dashcraft-core`
+- [ ] `dashcraft-mcp-codegen`
 - [ ] Site / Docs (`dashcraft.digitribe.world`)
 - [ ] Playground
 
@@ -36,4 +36,4 @@ paste error here
 - Browser:
 - Node.js (`node -v`):
 - React version:
-- `@dashcraft/core` version:
+- `dashcraft-core` version:

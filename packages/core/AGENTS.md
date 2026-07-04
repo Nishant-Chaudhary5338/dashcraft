@@ -1,17 +1,17 @@
-# AGENTS.md — @dashcraft/core
+# AGENTS.md — dashcraft-core
 
-Instructions for AI agents building dashboards with `@dashcraft/core`.
+Instructions for AI agents building dashboards with `dashcraft-core`.
 
 ---
 
 ## Package Overview
 
-`@dashcraft/core` is a **headless React dashboard library** that provides:
+`dashcraft-core` is a **headless React dashboard library** that provides:
 - Drag-and-drop layout with `@dnd-kit`
 - Resizable widgets
 - KPI cards with trend indicators
 - Recharts integration (bar, line, area, pie, scatter, radar, radialBar)
-- Nivo integration (heatmap, treemap, sunburst)
+- Hierarchy charts (heatmap, treemap, sunburst)
 - Zustand-based persistent store
 - Settings panels per widget
 - Layout persistence (localStorage / sessionStorage)
@@ -21,10 +21,9 @@ Instructions for AI agents building dashboards with `@dashcraft/core`.
 ## Installation
 
 ```bash
-npm install @dashcraft/core
+npm install dashcraft-core
 # Peer deps for charts (optional):
 npm install recharts
-npm install @nivo/core @nivo/heatmap @nivo/treemap @nivo/sunburst
 ```
 
 ---
@@ -33,24 +32,24 @@ npm install @nivo/core @nivo/heatmap @nivo/treemap @nivo/sunburst
 
 ```ts
 // Core components and hooks
-import { Dashboard, DashboardCard, useDashboard, useDashboardStore } from '@dashcraft/core'
+import { Dashboard, DashboardCard, useDashboard, useDashboardStore } from 'dashcraft-core'
 
 // Chart widgets (peer deps required)
-import { RechartsWidget } from '@dashcraft/core/widgets/recharts'
-import { NivoWidget } from '@dashcraft/core/widgets/nivo'
-import { KPIWidget } from '@dashcraft/core/widgets/kpi'
+import { RechartsWidget } from 'dashcraft-core/widgets/recharts'
+import { HierarchyWidget } from 'dashcraft-core/widgets/hierarchy'
+import { KPIWidget } from 'dashcraft-core/widgets/kpi'
 
 // All widgets from one path
-import { RechartsWidget, NivoWidget, KPIWidget } from '@dashcraft/core/widgets'
+import { RechartsWidget, HierarchyWidget, KPIWidget } from 'dashcraft-core/widgets'
 
 // Hooks only (tree-shakeable)
-import { useDashboard, useStateWithHistory, useDebounce } from '@dashcraft/core/hooks'
+import { useDashboard, useStateWithHistory, useDebounce } from 'dashcraft-core/hooks'
 
 // Store only
-import { useDashboardStore } from '@dashcraft/core/store'
+import { useDashboardStore } from 'dashcraft-core/store'
 
 // CSS (required for edit-mode UI)
-import '@dashcraft/core/styles.css'
+import 'dashcraft-core/styles.css'
 ```
 
 ---
@@ -141,14 +140,14 @@ Widget wrapper. Registers itself with the Dashboard store on mount.
 />
 ```
 
-### `<NivoWidget>`
+### `<HierarchyWidget>`
 
 ```tsx
-<NivoWidget
+<HierarchyWidget
   id="heatmap-1"
   chartType="heatmap"       // "heatmap" | "treemap" | "sunburst"
   title="Activity Heatmap"
-  data={nivoFormattedData}
+  data={hierarchyData}
   colorScheme="blues"
   height={300}
 />
@@ -327,8 +326,8 @@ function ChartWidget({ id }: { id: string }) {
 ### Minimal dashboard
 
 ```tsx
-import { Dashboard, DashboardCard } from '@dashcraft/core'
-import '@dashcraft/core/styles.css'
+import { Dashboard, DashboardCard } from 'dashcraft-core'
+import 'dashcraft-core/styles.css'
 
 export function MyDashboard() {
   return (
@@ -344,10 +343,10 @@ export function MyDashboard() {
 ### Full analytics dashboard
 
 ```tsx
-import { Dashboard, DashboardCard, useDashboard } from '@dashcraft/core'
-import { KPIWidget } from '@dashcraft/core/widgets/kpi'
-import { RechartsWidget } from '@dashcraft/core/widgets/recharts'
-import '@dashcraft/core/styles.css'
+import { Dashboard, DashboardCard, useDashboard } from 'dashcraft-core'
+import { KPIWidget } from 'dashcraft-core/widgets/kpi'
+import { RechartsWidget } from 'dashcraft-core/widgets/recharts'
+import 'dashcraft-core/styles.css'
 
 function EditControls() {
   const { isEditMode, toggleEditMode, saveLayout } = useDashboard()
@@ -410,8 +409,8 @@ import type {
   KPIFormat,
   KPITrend,
   ChartType,
-  NivoChartType,
-} from '@dashcraft/core'
+  HierarchyChartType,
+} from 'dashcraft-core'
 ```
 
 ---

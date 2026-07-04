@@ -7,85 +7,42 @@ on:
     branches: [main]
 
 jobs:
-  core:
-    name: "@dashcraft/core — Build & Test (Node ${{ matrix.node }})"
+  build-test:
+    name: Build & Test (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         node: [20, 22]
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+
+      - name: Setup Node ${{ matrix.node }}
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
-          cache: npm
-          cache-dependency-path: packages/core/package-lock.json
+          cache: pnpm
 
-      - name: Install @dashcraft/core dependencies
-        working-directory: packages/core
-        run: npm ci --legacy-peer-deps
+      - name: Install (frozen lockfile)
+        run: pnpm install --frozen-lockfile
 
-      - name: Type check @dashcraft/core
-        working-directory: packages/core
-        run: npm run typecheck
+      - name: Typecheck dashcraft-core
+        run: pnpm --filter dashcraft-core typecheck
 
-      - name: Build @dashcraft/core
-        working-directory: packages/core
-        run: npm run build
+      - name: Build dashcraft-core
+        run: pnpm --filter dashcraft-core build
 
-      - name: Test @dashcraft/core
-        working-directory: packages/core
-        run: npm run test
+      - name: Test dashcraft-core
+        run: pnpm --filter dashcraft-core test
 
-  mcp:
-    name: "@dashcraft/mcp-codegen — Build"
-    runs-on: ubuntu-latest
+      - name: Build dashcraft-mcp-codegen
+        run: pnpm --filter dashcraft-mcp-codegen build
 
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: tools/codegen/package-lock.json
-
-      - name: Install @dashcraft/mcp-codegen dependencies
-        working-directory: tools/codegen
-        run: npm ci --legacy-peer-deps
-
-      - name: Build MCP server
-        working-directory: tools/codegen
-        run: npm run build
-
-  site:
-    name: "Site — Build"
-    runs-on: ubuntu-latest
-    needs: core
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: apps/site/package-lock.json
-
-      - name: Install @dashcraft/core dependencies
-        working-directory: packages/core
-        run: npm ci --legacy-peer-deps
-
-      - name: Build @dashcraft/core
-        working-directory: packages/core
-        run: npm run build
-
-      - name: Install site dependencies
-        working-directory: apps/site
-        run: npm ci --legacy-peer-deps
-
-      - name: Build site
-        working-directory: apps/site
-        run: npm run build
+      - name: Build site (Next.js)
+        run: pnpm --filter site build

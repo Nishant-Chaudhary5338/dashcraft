@@ -205,6 +205,90 @@ const saasWidgets: ShowcaseWidget[] = [
     grid: { colStart: 7, colSpan: 6, rowStart: 8, rowSpan: 4 } },
 ];
 
+/* ── Marketing preset ── */
+const marketingWidgets: ShowcaseWidget[] = [
+  { kind: "kpi", id: "mk-leads", title: "Leads", value: 12840, previousValue: 10420, format: "number",
+    defaultPosition: { x: 0, y: 0 }, defaultSize: { width: 277, height: 116 }, grid: { colStart: 1, colSpan: 3, rowStart: 1, rowSpan: 2 } },
+  { kind: "kpi", id: "mk-cac", title: "CAC", value: 38.2, previousValue: 44.1, format: "currency",
+    defaultPosition: { x: 293, y: 0 }, defaultSize: { width: 277, height: 116 }, grid: { colStart: 4, colSpan: 3, rowStart: 1, rowSpan: 2 } },
+  { kind: "kpi", id: "mk-conv", title: "Conversion", value: 4.6, previousValue: 3.9, format: "percentage",
+    defaultPosition: { x: 586, y: 0 }, defaultSize: { width: 277, height: 116 }, grid: { colStart: 7, colSpan: 3, rowStart: 1, rowSpan: 2 } },
+  { kind: "kpi", id: "mk-roas", title: "ROAS", value: 3.8, previousValue: 3.2, format: "number",
+    defaultPosition: { x: 879, y: 0 }, defaultSize: { width: 281, height: 116 }, grid: { colStart: 10, colSpan: 3, rowStart: 1, rowSpan: 2 } },
+  { kind: "chart", id: "mk-leadtrend", title: "Lead Volume", chartType: "area",
+    data: [{ m: "Jan", v: 6200 }, { m: "Feb", v: 7400 }, { m: "Mar", v: 8100 }, { m: "Apr", v: 9800 }, { m: "May", v: 11200 }, { m: "Jun", v: 12840 }],
+    series: [{ dataKey: "v", name: "Leads", color: "#6366f1" }], xAxisKey: "m",
+    defaultPosition: { x: 0, y: 132 }, defaultSize: { width: 762, height: 296 }, grid: { colStart: 1, colSpan: 8, rowStart: 3, rowSpan: 5 } },
+  { kind: "chart", id: "mk-channels", title: "Channel Mix", chartType: "pie",
+    data: [{ name: "Paid Search", value: 38 }, { name: "Social", value: 27 }, { name: "Email", value: 20 }, { name: "Organic", value: 15 }],
+    series: [{ dataKey: "value", name: "Share", color: "#6366f1" }], xAxisKey: "name",
+    defaultPosition: { x: 778, y: 132 }, defaultSize: { width: 382, height: 296 }, grid: { colStart: 9, colSpan: 4, rowStart: 3, rowSpan: 5 } },
+  { kind: "chart", id: "mk-spend", title: "Spend by Campaign", chartType: "bar",
+    data: [{ c: "Brand", s: 42 }, { c: "Retarget", s: 31 }, { c: "Prospect", s: 26 }, { c: "Affiliate", s: 18 }],
+    series: [{ dataKey: "s", name: "Spend $k", color: "#f59e0b" }], xAxisKey: "c",
+    defaultPosition: { x: 0, y: 444 }, defaultSize: { width: 572, height: 240 }, grid: { colStart: 1, colSpan: 6, rowStart: 8, rowSpan: 4 } },
+  { kind: "chart", id: "mk-convtrend", title: "Conversion Rate", chartType: "line",
+    data: [{ w: "W1", r: 3.2 }, { w: "W2", r: 3.6 }, { w: "W3", r: 3.9 }, { w: "W4", r: 4.1 }, { w: "W5", r: 4.4 }, { w: "W6", r: 4.6 }],
+    series: [{ dataKey: "r", name: "CVR %", color: "#22c55e" }], xAxisKey: "w",
+    defaultPosition: { x: 588, y: 444 }, defaultSize: { width: 572, height: 240 }, grid: { colStart: 7, colSpan: 6, rowStart: 8, rowSpan: 4 } },
+];
+
+/* ── Finance preset ── */
+const financeWidgets: ShowcaseWidget[] = [
+  { kind: "kpi", id: "fn-rev", title: "Revenue", value: 2480000, previousValue: 2120000, format: "currency",
+    defaultPosition: { x: 0, y: 0 }, defaultSize: { width: 277, height: 116 }, grid: { colStart: 1, colSpan: 3, rowStart: 1, rowSpan: 2 } },
+  { kind: "kpi", id: "fn-burn", title: "Monthly Burn", value: 312000, previousValue: 338000, format: "currency",
+    defaultPosition: { x: 293, y: 0 }, defaultSize: { width: 277, height: 116 }, grid: { colStart: 4, colSpan: 3, rowStart: 1, rowSpan: 2 } },
+  { kind: "kpi", id: "fn-runway", title: "Runway (mo)", value: 22, previousValue: 19, format: "number",
+    defaultPosition: { x: 586, y: 0 }, defaultSize: { width: 277, height: 116 }, grid: { colStart: 7, colSpan: 3, rowStart: 1, rowSpan: 2 } },
+  { kind: "kpi", id: "fn-margin", title: "Gross Margin", value: 71.4, previousValue: 68.2, format: "percentage",
+    defaultPosition: { x: 879, y: 0 }, defaultSize: { width: 281, height: 116 }, grid: { colStart: 10, colSpan: 3, rowStart: 1, rowSpan: 2 } },
+  { kind: "chart", id: "fn-cash", title: "Cash Balance", chartType: "area",
+    data: [{ m: "Jan", v: 4.2 }, { m: "Feb", v: 4.0 }, { m: "Mar", v: 4.4 }, { m: "Apr", v: 4.9 }, { m: "May", v: 5.3 }, { m: "Jun", v: 6.1 }],
+    series: [{ dataKey: "v", name: "Cash $M", color: "#6366f1" }], xAxisKey: "m",
+    defaultPosition: { x: 0, y: 132 }, defaultSize: { width: 762, height: 296 }, grid: { colStart: 1, colSpan: 8, rowStart: 3, rowSpan: 5 } },
+  { kind: "chart", id: "fn-expense", title: "Expenses", chartType: "pie",
+    data: [{ name: "Payroll", value: 52 }, { name: "Infra", value: 18 }, { name: "Marketing", value: 16 }, { name: "Ops", value: 14 }],
+    series: [{ dataKey: "value", name: "Share", color: "#6366f1" }], xAxisKey: "name",
+    defaultPosition: { x: 778, y: 132 }, defaultSize: { width: 382, height: 296 }, grid: { colStart: 9, colSpan: 4, rowStart: 3, rowSpan: 5 } },
+  { kind: "chart", id: "fn-byproduct", title: "Revenue by Product", chartType: "bar",
+    data: [{ p: "Core", r: 1240 }, { p: "Pro", r: 720 }, { p: "Enterprise", r: 420 }, { p: "Add-ons", r: 100 }],
+    series: [{ dataKey: "r", name: "Rev $k", color: "#06b6d4" }], xAxisKey: "p",
+    defaultPosition: { x: 0, y: 444 }, defaultSize: { width: 572, height: 240 }, grid: { colStart: 1, colSpan: 6, rowStart: 8, rowSpan: 4 } },
+  { kind: "chart", id: "fn-profit", title: "Net Profit", chartType: "line",
+    data: [{ m: "Jan", p: -40 }, { m: "Feb", p: -20 }, { m: "Mar", p: 10 }, { m: "Apr", p: 60 }, { m: "May", p: 110 }, { m: "Jun", p: 180 }],
+    series: [{ dataKey: "p", name: "Profit $k", color: "#f59e0b" }], xAxisKey: "m",
+    defaultPosition: { x: 588, y: 444 }, defaultSize: { width: 572, height: 240 }, grid: { colStart: 7, colSpan: 6, rowStart: 8, rowSpan: 4 } },
+];
+
+/* ── Support / Ops preset ── */
+const supportWidgets: ShowcaseWidget[] = [
+  { kind: "kpi", id: "sp-open", title: "Open Tickets", value: 342, previousValue: 418, format: "number",
+    defaultPosition: { x: 0, y: 0 }, defaultSize: { width: 277, height: 116 }, grid: { colStart: 1, colSpan: 3, rowStart: 1, rowSpan: 2 } },
+  { kind: "kpi", id: "sp-csat", title: "CSAT", value: 94.2, previousValue: 91.5, format: "percentage",
+    defaultPosition: { x: 293, y: 0 }, defaultSize: { width: 277, height: 116 }, grid: { colStart: 4, colSpan: 3, rowStart: 1, rowSpan: 2 } },
+  { kind: "kpi", id: "sp-resolve", title: "Avg Resolution (h)", value: 6.4, previousValue: 8.1, format: "number",
+    defaultPosition: { x: 586, y: 0 }, defaultSize: { width: 277, height: 116 }, grid: { colStart: 7, colSpan: 3, rowStart: 1, rowSpan: 2 } },
+  { kind: "kpi", id: "sp-sla", title: "SLA Met", value: 97.8, previousValue: 95.2, format: "percentage",
+    defaultPosition: { x: 879, y: 0 }, defaultSize: { width: 281, height: 116 }, grid: { colStart: 10, colSpan: 3, rowStart: 1, rowSpan: 2 } },
+  { kind: "chart", id: "sp-volume", title: "Ticket Volume", chartType: "area",
+    data: [{ d: "Mon", v: 210 }, { d: "Tue", v: 264 }, { d: "Wed", v: 248 }, { d: "Thu", v: 288 }, { d: "Fri", v: 312 }, { d: "Sat", v: 180 }, { d: "Sun", v: 142 }],
+    series: [{ dataKey: "v", name: "Tickets", color: "#6366f1" }], xAxisKey: "d",
+    defaultPosition: { x: 0, y: 132 }, defaultSize: { width: 762, height: 296 }, grid: { colStart: 1, colSpan: 8, rowStart: 3, rowSpan: 5 } },
+  { kind: "chart", id: "sp-category", title: "By Category", chartType: "pie",
+    data: [{ name: "Billing", value: 34 }, { name: "Technical", value: 41 }, { name: "Account", value: 15 }, { name: "Other", value: 10 }],
+    series: [{ dataKey: "value", name: "Share", color: "#6366f1" }], xAxisKey: "name",
+    defaultPosition: { x: 778, y: 132 }, defaultSize: { width: 382, height: 296 }, grid: { colStart: 9, colSpan: 4, rowStart: 3, rowSpan: 5 } },
+  { kind: "chart", id: "sp-priority", title: "By Priority", chartType: "bar",
+    data: [{ p: "Urgent", n: 42 }, { p: "High", n: 96 }, { p: "Medium", n: 138 }, { p: "Low", n: 66 }],
+    series: [{ dataKey: "n", name: "Tickets", color: "#f59e0b" }], xAxisKey: "p",
+    defaultPosition: { x: 0, y: 444 }, defaultSize: { width: 572, height: 240 }, grid: { colStart: 1, colSpan: 6, rowStart: 8, rowSpan: 4 } },
+  { kind: "chart", id: "sp-restime", title: "Resolution Time", chartType: "line",
+    data: [{ w: "W1", h: 9.2 }, { w: "W2", h: 8.6 }, { w: "W3", h: 7.9 }, { w: "W4", h: 7.1 }, { w: "W5", h: 6.7 }, { w: "W6", h: 6.4 }],
+    series: [{ dataKey: "h", name: "Hours", color: "#22c55e" }], xAxisKey: "w",
+    defaultPosition: { x: 588, y: 444 }, defaultSize: { width: 572, height: 240 }, grid: { colStart: 7, colSpan: 6, rowStart: 8, rowSpan: 4 } },
+];
+
 export const PRESETS: Record<string, Preset> = {
   analytics: {
     label: "Analytics", description: "Web analytics: sessions, users, bounce rate, device breakdown",
@@ -217,6 +301,18 @@ export const PRESETS: Record<string, Preset> = {
   saas: {
     label: "SaaS Metrics", description: "Product metrics: MRR, churn, NPS, feature adoption, retention",
     accent: "#22c55e", widgets: saasWidgets,
+  },
+  marketing: {
+    label: "Marketing", description: "Growth metrics: leads, CAC, conversion, ROAS, channel mix",
+    accent: "#a855f7", widgets: marketingWidgets,
+  },
+  finance: {
+    label: "Finance", description: "Financials: revenue, burn, runway, margin, cash & profit",
+    accent: "#eab308", widgets: financeWidgets,
+  },
+  support: {
+    label: "Support / Ops", description: "Service metrics: tickets, CSAT, resolution time, SLA, priority",
+    accent: "#ef4444", widgets: supportWidgets,
   },
 };
 

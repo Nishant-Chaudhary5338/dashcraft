@@ -52,11 +52,14 @@ function widgetJSX(w: WidgetConfig, indent = "  "): string {
   const pos = `defaultPosition={{ x: ${w.defaultPosition.x}, y: ${w.defaultPosition.y} }}`;
   const size = `defaultSize={{ width: ${w.defaultSize.width}, height: ${w.defaultSize.height} }}`;
   const bools = boolProps(w);
+  // Emit user-supplied strings as JSX expressions via JSON.stringify so titles
+  // containing quotes, angle brackets, or backslashes can't break the output.
+  const title = JSON.stringify(w.title);
 
   if (comp === "KPIWidget") {
     return `${indent}<KPIWidget
 ${indent}  id="${w.id}"
-${indent}  label="${w.title}"
+${indent}  label={${title}}
 ${indent}  value={/* TODO: replace with real data */ 0}${formatProp(w)}
 ${indent}  ${pos}
 ${indent}  ${size}${bools}
@@ -66,10 +69,10 @@ ${indent}/>`;
   if (comp === "RechartsWidget") {
     return `${indent}<RechartsWidget
 ${indent}  id="${w.id}"
-${indent}  title="${w.title}"
+${indent}  title={${title}}
 ${indent}  chartType="${getChartType(w.type)}"
 ${indent}  data={/* TODO: replace with real data */ []}
-${indent}  series={[{ dataKey: 'value', name: '${w.title}', color: '#6366f1' }]}
+${indent}  series={[{ dataKey: 'value', name: ${title}, color: '#6366f1' }]}
 ${indent}  xAxisKey="name"
 ${indent}  ${pos}
 ${indent}  ${size}${bools}
@@ -78,7 +81,7 @@ ${indent}/>`;
 
   return `${indent}<HierarchyWidget
 ${indent}  id="${w.id}"
-${indent}  title="${w.title}"
+${indent}  title={${title}}
 ${indent}  chartType="${getChartType(w.type)}"
 ${indent}  data={/* TODO: replace with real data */ []}
 ${indent}  ${pos}
@@ -95,11 +98,11 @@ export function generateDashboardCode(
   const hasKpi = widgets.some((w) => w.type === "kpi");
 
   const imports: string[] = [];
-  imports.push(`import { Dashboard } from '@dashcraft/core'`);
-  if (hasKpi) imports.push(`import { KPIWidget } from '@dashcraft/core/widgets/kpi'`);
-  if (hasRecharts) imports.push(`import { RechartsWidget } from '@dashcraft/core/widgets/recharts'`);
-  if (hasHierarchy) imports.push(`import { HierarchyWidget } from '@dashcraft/core/widgets/hierarchy'`);
-  imports.push(`import '@dashcraft/core/styles.css'`);
+  imports.push(`import { Dashboard } from 'dashcraft-core'`);
+  if (hasKpi) imports.push(`import { KPIWidget } from 'dashcraft-core/widgets/kpi'`);
+  if (hasRecharts) imports.push(`import { RechartsWidget } from 'dashcraft-core/widgets/recharts'`);
+  if (hasHierarchy) imports.push(`import { HierarchyWidget } from 'dashcraft-core/widgets/hierarchy'`);
+  imports.push(`import 'dashcraft-core/styles.css'`);
 
   const widgetLines = widgets.map((w) => widgetJSX(w)).join("\n\n");
 
@@ -107,7 +110,7 @@ export function generateDashboardCode(
 
 export function ${componentName}() {
   return (
-    <Dashboard id="generated" persist="generated-v1">
+    <Dashboard persistenceKey="generated-v1" defaultEditMode>
 ${widgetLines}
     </Dashboard>
   )
@@ -129,17 +132,17 @@ export function generateProjectFiles(
         private: true,
         scripts: { dev: "vite", build: "tsc && vite build", preview: "vite preview" },
         dependencies: {
-          "@dashcraft/core": "^0.1.0",
+          "dashcraft-core": "^0.1.0",
           react: "^19.0.0",
           "react-dom": "^19.0.0",
-          recharts: "^2.15.0",
+          recharts: "^3.0.0",
         },
         devDependencies: {
           "@vitejs/plugin-react": "^4.3.4",
           typescript: "^5.7.0",
           vite: "^6.0.0",
-          "@types/react": "^18.3.0",
-          "@types/react-dom": "^18.3.0",
+          "@types/react": "^19.0.0",
+          "@types/react-dom": "^19.0.0",
         },
       },
       null,
@@ -224,7 +227,7 @@ Add \`className\` or \`style\` props to style widgets to match your design syste
 ## Learn more
 
 - [dashcraft docs](https://dashcraft.digitribe.world/docs)
-- [@dashcraft/core on npm](https://npmjs.com/package/@dashcraft/core)
+- [dashcraft-core on npm](https://npmjs.com/package/dashcraft-core)
 `,
   };
 }

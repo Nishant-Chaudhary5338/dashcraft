@@ -77,21 +77,29 @@ export const slowPreset = {
 // ============================================================
 
 /**
- * Collection of all animation presets
- * Use these for consistent animations across the dashboard
+ * Named collection of all built-in animation presets, keyed by
+ * {@link AnimationPresetKey}. Use these for consistent motion across the
+ * dashboard instead of inventing per-widget spring/tween values.
+ *
+ * Each entry is either a spring config (`type: "spring"` with `stiffness`/
+ * `damping`, optionally `mass`) or a tween config (`type: "tween"` with
+ * `duration` in seconds) — shape it directly to a Framer Motion `transition`
+ * prop, or run it through {@link springToCss} / {@link getCssTransition} to
+ * get a plain CSS transition string.
  *
  * @example
  * ```tsx
- * import { animationPresets } from '@dashcraft/utils';
+ * import { animationPresets } from "@dashcraft/core";
  *
  * // In framer-motion
- * <motion.div animate={{ x: 100 }} transition={animationPresets.spring}>
+ * <motion.div animate={{ x: 100 }} transition={animationPresets.spring} />
  *
- * // In CSS
- * .widget {
- *   transition: transform 0.2s cubic-bezier(...);
- * }
+ * // In CSS (via getCssTransition)
+ * const style = { transition: getCssTransition("snappy", "transform") };
  * ```
+ * @see getAnimationPreset
+ * @see getCssTransition
+ * @see AnimationPresetKey
  */
 export const animationPresets = {
   spring: springPreset,
@@ -104,14 +112,35 @@ export const animationPresets = {
 } as const;
 
 /**
- * Type for animation preset keys
+ * Union of every valid key into {@link animationPresets} (`"spring"` |
+ * `"snappy"` | `"gentle"` | `"tween"` | `"bounce"` | `"stiff"` | `"slow"`).
+ *
+ * Use this type wherever an API accepts a preset name, e.g.
+ * {@link getAnimationPreset} and {@link getCssTransition}.
+ * @example
+ * ```ts
+ * import type { AnimationPresetKey } from "@dashcraft/core";
+ *
+ * function applyPreset(key: AnimationPresetKey) { ... }
+ * ```
+ * @see animationPresets
  */
 export type AnimationPresetKey = keyof typeof animationPresets;
 
 /**
- * Get an animation preset by key
- * @param key - Preset key
- * @returns Animation preset configuration
+ * Looks up a single animation preset by its key.
+ *
+ * Equivalent to `animationPresets[key]`, provided as a function for call
+ * sites that prefer not to import the full `animationPresets` object.
+ * @param key - One of {@link AnimationPresetKey}.
+ * @returns The preset's spring or tween configuration.
+ * @example
+ * ```ts
+ * import { getAnimationPreset } from "@dashcraft/core";
+ *
+ * const spring = getAnimationPreset("bounce");
+ * ```
+ * @see animationPresets
  */
 export function getAnimationPreset(key: AnimationPresetKey) {
   return animationPresets[key];
@@ -122,10 +151,29 @@ export function getAnimationPreset(key: AnimationPresetKey) {
 // ============================================================
 
 /**
- * Convert spring physics to CSS cubic-bezier approximation
- * @param stiffness - Spring stiffness (default: 400)
- * @param damping - Spring damping (default: 25)
- * @returns CSS cubic-bezier string
+ * Approximates spring physics (stiffness/damping) as a CSS `cubic-bezier()`
+ * timing function.
+ *
+ * CSS has no native spring easing, so this maps the same stiffness/damping
+ * inputs used by {@link animationPresets}'s spring entries to the closest
+ * cubic-bezier curve — useful when a widget needs spring-like motion via
+ * plain CSS transitions rather than Framer Motion. The approximation is
+ * deliberately simple and will diverge from true spring physics (e.g. no
+ * overshoot) for extreme stiffness/damping combinations.
+ * @param stiffness - Spring stiffness; higher values start the motion
+ * faster.
+ * @default 400
+ * @param damping - Spring damping; higher values reduce overshoot.
+ * @default 25
+ * @returns A `cubic-bezier(x1, y1, x2, y2)` string usable as a CSS
+ * `transition-timing-function`.
+ * @example
+ * ```ts
+ * import { springToCss } from "@dashcraft/core";
+ *
+ * const easing = springToCss(600, 30); // "cubic-bezier(0.27, ...)"
+ * ```
+ * @see getCssTransition
  */
 export function springToCss(
   stiffness: number = 400,
@@ -147,11 +195,29 @@ export function springToCss(
 }
 
 /**
- * Get CSS transition string for common properties
- * @param preset - Animation preset key
- * @param properties - CSS properties to animate (default: 'all')
- * @param duration - Override duration in seconds
- * @returns CSS transition string
+ * Builds a complete CSS `transition` shorthand string from a named
+ * animation preset.
+ *
+ * Resolves the preset via {@link animationPresets}, converts spring presets
+ * to an approximate easing curve via {@link springToCss} (tween presets use
+ * `ease` via the browser default when no easing keyword is added — the
+ * cubic-bezier is only computed for spring-type presets), and combines it
+ * with a duration and target CSS property list into one transition value.
+ * @param preset - Preset key to base the transition on.
+ * @param properties - CSS properties to animate, space-separated.
+ * @default "all"
+ * @param duration - Overrides the preset's duration, in seconds. For spring
+ * presets (which have no inherent duration), defaults to `0.2`; for tween
+ * presets, defaults to the preset's own `duration`.
+ * @returns A CSS transition value, e.g. `"transform 0.2s cubic-bezier(...)"`.
+ * @example
+ * ```ts
+ * import { getCssTransition } from "@dashcraft/core";
+ *
+ * const style = { transition: getCssTransition("snappy", "transform, opacity") };
+ * ```
+ * @see animationPresets
+ * @see springToCss
  */
 export function getCssTransition(
   preset: AnimationPresetKey,

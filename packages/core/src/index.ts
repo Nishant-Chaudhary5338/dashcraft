@@ -35,8 +35,13 @@ export {
   usePersistence,
   usePersistedState,
   useStateWithHistory,
+  useMeasure,
+  useMeasureWidth,
+  useTabs,
 } from "./hooks";
 export type {
+  ElementSize,
+  UseTabsReturn,
   UseDraggableOptions,
   UseDraggableReturn,
   ResizeHandle,
