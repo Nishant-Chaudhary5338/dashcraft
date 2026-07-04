@@ -48,8 +48,27 @@ export const PALETTE: readonly PaletteEntry[] = [
 const RECHARTS = new Set<PlaygroundType>(["bar_chart", "line_chart", "area_chart", "pie_chart", "scatter_chart", "radar_chart"]);
 const HIERARCHY = new Set<PlaygroundType>(["heatmap", "treemap", "sunburst"]);
 
-/** Build a new widget, stacking it just below the current content. */
-export function makeWidget(type: PlaygroundType, id: string, y: number): PlaygroundWidget {
+interface Rect { x: number; y: number; w: number; h: number }
+
+/**
+ * First-fit placement: scan the canvas top-to-bottom, left-to-right for the
+ * first slot where `w`×`h` fits without overlapping existing rects (with a gap).
+ * This fills open space above/beside instead of always stacking at the bottom.
+ */
+export function firstFitSlot(rects: Rect[], w: number, h: number, canvasW = 1160): { x: number; y: number } {
+  const gap = 16;
+  const step = 20;
+  for (let y = 0; y < 6000; y += step) {
+    for (let x = 0; x + w <= canvasW; x += step) {
+      const hit = rects.some((r) => x < r.x + r.w + gap && x + w + gap > r.x && y < r.y + r.h + gap && y + h + gap > r.y);
+      if (!hit) return { x, y };
+    }
+  }
+  return { x: 0, y: 0 };
+}
+
+/** Build a new widget at a given canvas position. */
+export function makeWidget(type: PlaygroundType, id: string, pos: { x: number; y: number }): PlaygroundWidget {
   const entry = PALETTE.find((p) => p.type === type)!;
   return {
     id,
@@ -60,7 +79,7 @@ export function makeWidget(type: PlaygroundType, id: string, y: number): Playgro
     settings: false,
     delete: true,
     format: "number",
-    defaultPosition: { x: 0, y },
+    defaultPosition: pos,
     defaultSize: entry.size,
   };
 }

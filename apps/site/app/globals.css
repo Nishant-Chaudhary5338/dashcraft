@@ -1103,3 +1103,15 @@ h1,h2,h3,h4,h5,h6 {
     z-index: 60; box-shadow: -10px 0 34px rgba(0,0,0,0.4); overflow-y: auto;
   }
 }
+
+/* Playground preview mode — full canvas, no edit panels. */
+.pg-body.is-preview { grid-template-columns: 1fr; }
+.pg-body.is-preview .pg-canvas-scroll { padding: 32px 24px; }
+
+/* Playground widgets get a subtle card surface (edit + preview) so they read
+   as real cards; consumers style their own in their app. */
+.pg-canvas-scroll .dashcraft-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}

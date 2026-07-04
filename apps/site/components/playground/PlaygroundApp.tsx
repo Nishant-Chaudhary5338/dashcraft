@@ -7,7 +7,7 @@ import { CopyButton } from "@/components/ui/CopyButton";
 import { PlaygroundCanvas } from "./PlaygroundCanvas";
 import { ConfigPanel } from "./ConfigPanel";
 import { ImportPanel } from "./ImportPanel";
-import { PALETTE, makeWidget, toCodegen, type PlaygroundType, type PlaygroundWidget } from "./widgetKit";
+import { PALETTE, makeWidget, firstFitSlot, toCodegen, type PlaygroundType, type PlaygroundWidget } from "./widgetKit";
 
 /** Read live drag/resize state from the dashcraft store so generated code
  *  reflects exactly how the user arranged the canvas. */
@@ -34,7 +34,14 @@ export function PlaygroundApp(): React.ReactElement {
   const [codeOpen, setCodeOpen] = useState(false);
   const [tab, setTab] = useState<"builder" | "import">("builder");
   const [configOpen, setConfigOpen] = useState(false);
+  const [preview, setPreview] = useState(false);
   const counter = useRef(0);
+
+  // Preview = view mode: drives the dashcraft store's edit mode so all edit
+  // affordances (drag handle, resize grips, delete, gear) hide.
+  useEffect(() => {
+    useDashboardStore.getState().setEditMode(!preview);
+  }, [preview]);
 
   // Selecting a widget opens the contextual config panel.
   const selectWidget = useCallback((id: string) => {
@@ -63,12 +70,18 @@ export function PlaygroundApp(): React.ReactElement {
   }, []);
 
   const addWidget = useCallback((type: PlaygroundType) => {
-    // Side effects kept OUT of the setWidgets updater (StrictMode double-invokes
-    // it → duplicate ids). Compute the id once here.
     const id = `w${++counter.current}`;
+    const size = PALETTE.find((p) => p.type === type)!.size;
     setWidgets((prev) => {
-      const bottom = prev.reduce((m, w) => Math.max(m, w.defaultPosition.y + w.defaultSize.height), 0);
-      return [...prev, makeWidget(type, id, prev.length ? bottom + 16 : 0)];
+      // Layout-aware placement: drop the new widget in the first open slot
+      // (top-left first) using LIVE positions, not always at the bottom.
+      const live = readLive(prev);
+      const rects = prev.map((w) => {
+        const p = live[w.id]?.position ?? w.defaultPosition;
+        const s = live[w.id]?.size ?? w.defaultSize;
+        return { x: p.x, y: p.y, w: s.width, h: s.height };
+      });
+      return [...prev, makeWidget(type, id, firstFitSlot(rects, size.width, size.height))];
     });
     setSelectedId(id);
     setConfigOpen(true);
@@ -119,6 +132,15 @@ export function PlaygroundApp(): React.ReactElement {
               {widgets.length} widget{widgets.length !== 1 ? "s" : ""}
             </span>
           )}
+          <button
+            onClick={() => { setPreview((v) => !v); setTab("builder"); }}
+            className={`btn ${preview ? "btn-signal" : "btn-ghost"}`}
+            style={{ padding: "5px 12px", fontSize: "0.82rem" }}
+            disabled={!widgets.length}
+            title={preview ? "Back to editing" : "Preview the finished dashboard"}
+          >
+            {preview ? "✎ Edit" : "◱ Preview"}
+          </button>
           <button onClick={clear} className="btn btn-ghost" style={{ padding: "5px 12px", fontSize: "0.82rem" }}>
             Clear
           </button>
@@ -131,17 +153,19 @@ export function PlaygroundApp(): React.ReactElement {
         </div>
       </div>
 
-      <div className={`pg-body${configOpen && selectedId ? " cfg-open" : ""}`}>
-        <aside className="playground-panel pg-rail">
-          <div className="pg-rail-list">
-            {PALETTE.map((p) => (
-              <button key={p.type} className="pg-icon-btn" onClick={() => addWidget(p.type)} aria-label={`Add ${p.label}`}>
-                <span className="pg-icon-glyph">{p.icon}</span>
-                <span className="pg-icon-tip">{p.label}</span>
-              </button>
-            ))}
-          </div>
-        </aside>
+      <div className={`pg-body${preview ? " is-preview" : configOpen && selectedId ? " cfg-open" : ""}`}>
+        {!preview && (
+          <aside className="playground-panel pg-rail">
+            <div className="pg-rail-list">
+              {PALETTE.map((p) => (
+                <button key={p.type} className="pg-icon-btn" onClick={() => addWidget(p.type)} aria-label={`Add ${p.label}`}>
+                  <span className="pg-icon-glyph">{p.icon}</span>
+                  <span className="pg-icon-tip">{p.label}</span>
+                </button>
+              ))}
+            </div>
+          </aside>
+        )}
 
         <div className="pg-canvas-scroll">
           {tab === "import" ? (
@@ -157,11 +181,11 @@ export function PlaygroundApp(): React.ReactElement {
               </p>
             </div>
           ) : (
-            <PlaygroundCanvas widgets={widgets} onDelete={removeWidget} onSelect={selectWidget} selectedId={selectedId} />
+            <PlaygroundCanvas widgets={widgets} onDelete={removeWidget} onSelect={selectWidget} selectedId={preview ? null : selectedId} preview={preview} />
           )}
         </div>
 
-        {configOpen && selectedId && (
+        {!preview && configOpen && selectedId && (
           <ConfigPanel
             widgets={widgets}
             selectedId={selectedId}

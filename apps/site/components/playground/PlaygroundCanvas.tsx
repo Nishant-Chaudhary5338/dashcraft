@@ -21,16 +21,18 @@ export function PlaygroundCanvas({
   onDelete,
   onSelect,
   selectedId,
+  preview = false,
 }: {
   widgets: PlaygroundWidget[];
   onDelete: (id: string) => void;
   onSelect: (id: string) => void;
   selectedId: string | null;
+  preview?: boolean;
 }): React.ReactElement {
   return (
     <div
       style={{ position: "relative", width: CANVAS_WIDTH, minHeight: 560, margin: "0 auto" }}
-      onClickCapture={(e) => {
+      onClickCapture={preview ? undefined : (e) => {
         const el = (e.target as HTMLElement).closest("[data-widget-id]");
         const id = el?.getAttribute("data-widget-id");
         if (id) onSelect(id);
