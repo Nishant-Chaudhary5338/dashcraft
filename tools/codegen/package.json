@@ -10,7 +10,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
-    "start": "node build/index.js"
+    "start": "node build/index.js",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.36.0",
@@ -41,5 +42,9 @@
     "dashcraft-core",
     "ai-native",
     "dashboard-generator"
+  ],
+  "files": [
+    "build",
+    "README.md"
   ]
 }
