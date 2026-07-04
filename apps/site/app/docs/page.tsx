@@ -17,15 +17,15 @@ export default function DocsPage() {
         { href: "/docs/components#dashboardcard", label: "DashboardCard", desc: "Widget wrapper with boolean behaviour props" },
         { href: "/docs/components#kpiwidget", label: "KPIWidget", desc: "Metric cards with trend indicators" },
         { href: "/docs/components#rechartswidget", label: "RechartsWidget", desc: "recharts integration" },
-        { href: "/docs/components#nivowidget", label: "NivoWidget", desc: "@nivo integration" },
+        { href: "/docs/components#hierarchywidget", label: "HierarchyWidget", desc: "recharts treemap & sunburst, built-in heatmap" },
       ],
     },
     {
       title: "Hooks",
       links: [
         { href: "/docs/hooks#useDashboard", label: "useDashboard", desc: "Access dashboard state and edit mode" },
-        { href: "/docs/hooks#useWidgetData", label: "useWidgetData", desc: "Subscribe to widget data" },
-        { href: "/docs/hooks#usePersistence", label: "usePersistence", desc: "Manual layout persistence" },
+        { href: "/docs/hooks#useWidgetEvents", label: "useWidgetEvents", desc: "Subscribe to widget lifecycle events" },
+        { href: "/docs/hooks#usePersistence", label: "usePersistence", desc: "General-purpose persisted state" },
       ],
     },
     {

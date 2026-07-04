@@ -4,31 +4,52 @@ import { useCallback, useRef, useState } from "react";
 // Types
 // ============================================================
 
+/**
+ * The value plus full undo/redo controls returned by
+ * {@link useStateWithHistory}.
+ */
 export interface StateWithHistory<T> {
-  /** Current value */
+  /** The value at the current position in history — equivalent to `history[index]`. */
   value: T;
-  /** Full history array */
+  /**
+   * All recorded values in chronological order. When
+   * {@link UseStateWithHistoryOptions.maxHistory} is set and exceeded, the
+   * oldest entries are dropped so this array never grows past that limit.
+   */
   history: T[];
-  /** Current index in history */
+  /** Position of `value` within `history` (0-based). */
   index: number;
-  /** Whether there is a previous state to go back to */
+  /** `true` if {@link back} would move to an earlier value. */
   canGoBack: boolean;
-  /** Whether there is a future state to go forward to */
+  /** `true` if {@link forward} would move to a later value. */
   canGoForward: boolean;
-  /** Set a new value (or functional update) — truncates future on new entry */
+  /**
+   * Sets a new current value, accepting either a value or an updater
+   * function (like `useState`). Any "future" entries beyond the current
+   * index are discarded first — branching from a past state overwrites
+   * the redo stack, matching standard undo/redo semantics.
+   */
   set: (valueOrUpdater: T | ((prev: T) => T)) => void;
-  /** Move one step back in history */
+  /** Moves one step back in history (undo). No-op if {@link canGoBack} is `false`. */
   back: () => void;
-  /** Move one step forward in history */
+  /** Moves one step forward in history (redo). No-op if {@link canGoForward} is `false`. */
   forward: () => void;
-  /** Jump to a specific index */
+  /** Jumps directly to an arbitrary history index, clamped to `[0, history.length - 1]`. */
   go: (index: number) => void;
-  /** Reset history to a fresh initial value */
+  /** Discards all history and starts fresh at `initialValue` (index 0). */
   reset: (initialValue: T) => void;
 }
 
+/**
+ * Configuration for {@link useStateWithHistory}.
+ */
 export interface UseStateWithHistoryOptions {
-  /** Maximum number of history entries to keep (default: unlimited) */
+  /**
+   * Maximum number of entries to retain in {@link StateWithHistory.history}.
+   * Once exceeded, the oldest entries are dropped on each new `set` call.
+   *
+   * @default undefined (unlimited history)
+   */
   maxHistory?: number;
 }
 
@@ -37,8 +58,42 @@ export interface UseStateWithHistoryOptions {
 // ============================================================
 
 /**
- * Like useState but keeps a navigable history of all values.
- * Returns a single-element tuple: [stateWithHistory]
+ * Like `useState`, but keeps a full undo/redo-navigable history of every
+ * value set.
+ *
+ * Use this for widget content that needs an undo/redo affordance — e.g. a
+ * chart's filter state, a text-editor widget's content, or any
+ * step-through-changes UI. History and index live in refs (not state) so
+ * that reading `historyRef.current` inside `set` never sees a stale
+ * closure; a single `forceUpdate` counter triggers the one re-render
+ * needed per change.
+ *
+ * @param initialValue - The value history starts at (index 0).
+ * @param options - Optional history size limit.
+ * @returns A single-element tuple `[stateWithHistory]` containing the
+ * current value and undo/redo controls. (The single-element tuple shape,
+ * rather than returning the object directly, keeps this hook consistent
+ * with other stateful hooks in this package that return tuples.)
+ *
+ * @example
+ * ```tsx
+ * import { useStateWithHistory } from "@dashcraft/core";
+ *
+ * function FilterPanel() {
+ *   const [filter] = useStateWithHistory({ range: "7d" }, { maxHistory: 20 });
+ *
+ *   return (
+ *     <div>
+ *       <button onClick={filter.back} disabled={!filter.canGoBack}>Undo</button>
+ *       <button onClick={filter.forward} disabled={!filter.canGoForward}>Redo</button>
+ *       <button onClick={() => filter.set({ range: "30d" })}>Last 30 days</button>
+ *       <pre>{JSON.stringify(filter.value)}</pre>
+ *     </div>
+ *   );
+ * }
+ * ```
+ *
+ * @see {@link StateWithHistory}
  */
 export function useStateWithHistory<T>(
   initialValue: T,

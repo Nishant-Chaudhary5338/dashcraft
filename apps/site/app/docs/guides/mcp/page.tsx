@@ -27,7 +27,7 @@ export default function McpGuidePage() {
       <Code code={`{
   "mcpServers": {
     "dashcraft": {
-      "command": "dashcraft-mcp"
+      "command": "dashcraft-codegen"
     }
   }
 }`} />
@@ -67,17 +67,23 @@ export default function McpGuidePage() {
       <Code code={`// Example prompt:
 "Generate @dashcraft/core code for these widgets: [widget array]"
 
-// Returns ready-to-use TSX:
-import { Dashboard, DashboardCard, KPIWidget } from '@dashcraft/core'
+// Returns ready-to-use TSX (widgets render their own card — no wrapper):
+import { Dashboard } from '@dashcraft/core'
+import { KPIWidget } from '@dashcraft/core/widgets/kpi'
 import '@dashcraft/core/styles.css'
 
 export function GeneratedDashboard() {
   return (
-    <Dashboard id="generated" persist="generated-v1">
-      <DashboardCard id="monthly-revenue-widget" drag resize
-        style={{ gridColumn: '1 / span 3', gridRow: '1 / span 2' }}>
-        <KPIWidget title="Monthly Revenue" value={0} format="currency" />
-      </DashboardCard>
+    <Dashboard persistenceKey="generated-v1" defaultEditMode>
+      <KPIWidget
+        id="monthly-revenue"
+        label="Monthly Revenue"
+        value={0}
+        format="currency"
+        drag resize settings
+        defaultPosition={{ x: 0, y: 0 }}
+        defaultSize={{ width: 260, height: 130 }}
+      />
     </Dashboard>
   )
 }`} />
@@ -111,7 +117,7 @@ unzip generated.zip && cd my-dashboard && npm install && npm run dev`} />
       <Code code={`{
   "mcpServers": {
     "dashcraft": {
-      "command": "dashcraft-mcp"
+      "command": "dashcraft-codegen"
     }
   }
 }`} />

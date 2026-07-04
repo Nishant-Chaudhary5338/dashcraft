@@ -16,6 +16,33 @@ import type { ChartComponentProps } from "../recharts.types";
 // ScatterChartWidget Component
 // ============================================================
 
+/**
+ * Renders a recharts `<ScatterChart>` — one `<Scatter>` series per entry in
+ * `series`. For each series, every row's `x` is `Number(data[xAxisKey])`, `y`
+ * is `Number(data[series.dataKey])`, and the bubble size (`z`) reuses the
+ * same `y` value (there is no separate size field in {@link DataPoint} —
+ * bubble size therefore tracks the plotted metric itself, not an independent
+ * third dimension). Used internally by {@link RechartsWidget} when `chartType="scatter"`.
+ *
+ * @param props - {@link ChartComponentProps}.
+ * @returns A `ResponsiveContainer`-wrapped recharts scatter chart.
+ *
+ * @example
+ * ```tsx
+ * import { RechartsWidget } from "@dashcraft/core";
+ *
+ * <RechartsWidget
+ *   chartType="scatter"
+ *   id="correlation"
+ *   title="Price vs Demand"
+ *   xAxisKey="price"
+ *   data={[{ price: 10, demand: 90 }, { price: 20, demand: 60 }]}
+ *   series={[{ dataKey: "demand", color: "#22c55e" }]}
+ * />
+ * ```
+ *
+ * @see {@link RechartsWidget}
+ */
 export const ScatterChartWidget = React.memo(function ScatterChartWidget({
   data,
   series,

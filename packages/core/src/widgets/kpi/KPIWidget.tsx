@@ -6,32 +6,56 @@ import type { DashboardCardProps } from "../../components/DashboardCard";
 // Types
 // ============================================================
 
+/**
+ * Direction of change relative to a previous value. Drives both the trend
+ * icon (up/down arrow or flat line) and its color (emerald/red/gray).
+ */
 export type KPITrend = "up" | "down" | "neutral";
 
+/**
+ * Display format applied to a numeric {@link KPIWidgetProps.value} (ignored
+ * for string values, which are always rendered verbatim).
+ * - `"number"` — locale-formatted plain number (`Intl.NumberFormat`).
+ * - `"currency"` — locale-formatted currency using {@link KPIWidgetProps.currency}.
+ * - `"percentage"` — fixed-decimal number suffixed with `%`.
+ * - `"text"` — falls through to the default (`"number"`) formatting branch; use a string `value` instead if you want truly unformatted text.
+ */
 export type KPIFormat = "number" | "currency" | "percentage" | "text";
 
+/**
+ * Props for {@link KPIWidget}. Extends every base dashboard-card prop
+ * (title, id, drag/resize handles, etc — see {@link DashboardCardProps})
+ * except `children` and `type`, since the widget hardcodes `type="kpi"` and
+ * the formatted value/trend is the card's content.
+ */
 export interface KPIWidgetProps extends Omit<DashboardCardProps, "children" | "type"> {
-  /** The main value to display */
+  /** The main value to display. Strings are rendered as-is (no formatting applied); numbers are formatted per `format`. */
   readonly value: number | string;
-  /** Label/title for the KPI */
+  /** Label/title shown beneath the value. */
   readonly label: string;
-  /** Previous value for trend calculation */
+  /** Previous value used to auto-calculate `trend` and the default `trendLabel` (as a `+X%`/`-X%` change). Ignored if `value` is a string. */
   readonly previousValue?: number;
-  /** Format type for the value */
+  /** Display format for a numeric `value`.
+   * @default "number" */
   readonly format?: KPIFormat;
-  /** Currency code (e.g., "USD", "EUR") for currency format */
+  /** ISO 4217 currency code (e.g. `"USD"`, `"EUR"`) used only when `format="currency"`.
+   * @default "USD" */
   readonly currency?: string;
-  /** Number of decimal places */
+  /** Number of decimal places for numeric formatting and the auto-calculated trend percentage.
+   * @default 0 */
   readonly decimals?: number;
-  /** Trend direction (auto-calculated if previousValue provided) */
+  /** Explicit trend direction. Overrides the auto-calculation from `value`/`previousValue`.
+   * @default Auto-calculated from `value` vs `previousValue` when both are numeric; `"neutral"` otherwise. */
   readonly trend?: KPITrend;
-  /** Custom trend label (e.g., "+12% vs last month") */
+  /** Custom trend caption (e.g. `"+12% vs last month"`). Overrides the auto-calculated `±X%` label.
+   * @default Auto-calculated `±X%` change vs `previousValue` when both `value` and `previousValue` are numeric; hidden entirely otherwise. */
   readonly trendLabel?: string;
-  /** Icon to display */
+  /** Icon rendered above the value, dimmed to 50% opacity. */
   readonly icon?: React.ReactNode;
-  /** Value color override */
+  /** Inline color override for the value text (any CSS color). Falls back to the surrounding theme's text color when omitted. */
   readonly valueColor?: string;
-  /** Whether to show a subtle background */
+  /** Whether to render a subtle white-to-gray gradient background behind the content.
+   * @default false */
   readonly showBackground?: boolean;
 }
 
@@ -39,6 +63,17 @@ export interface KPIWidgetProps extends Omit<DashboardCardProps, "children" | "t
 // Helper Functions
 // ============================================================
 
+/**
+ * Formats a KPI value for display per {@link KPIFormat}. String values pass
+ * through unchanged (formatting only applies to numbers). Not exported —
+ * internal to {@link KPIWidget}.
+ *
+ * @param value - Raw value to format.
+ * @param format - Which format to apply (`"text"` behaves the same as `"number"`; see {@link KPIFormat}).
+ * @param currency - ISO 4217 currency code, used only when `format === "currency"`.
+ * @param decimals - Decimal places for `"number"`/`"currency"`/`"percentage"` formatting.
+ * @returns The formatted string.
+ */
 function formatValue(
   value: number | string,
   format: KPIFormat,
@@ -66,6 +101,14 @@ function formatValue(
   }
 }
 
+/**
+ * Derives a {@link KPITrend} by comparing `current` to `previous`. Not
+ * exported — internal to {@link KPIWidget}.
+ *
+ * @param current - The current KPI value; string values always yield `"neutral"` (trend comparison requires a number).
+ * @param previous - The prior value to compare against.
+ * @returns `"up"` if greater, `"down"` if lesser, `"neutral"` if equal or `current` isn't numeric.
+ */
 function calculateTrend(current: number | string, previous: number): KPITrend {
   if (typeof current === "string") return "neutral";
   if (current > previous) return "up";
@@ -73,6 +116,7 @@ function calculateTrend(current: number | string, previous: number): KPITrend {
   return "neutral";
 }
 
+/** Maps a {@link KPITrend} to its Tailwind text-color class. Not exported — internal to {@link KPIWidget}. */
 function getTrendColor(trend: KPITrend): string {
   switch (trend) {
     case "up":
@@ -84,6 +128,7 @@ function getTrendColor(trend: KPITrend): string {
   }
 }
 
+/** Maps a {@link KPITrend} to its inline SVG arrow (up/down) or flat-line icon. Not exported — internal to {@link KPIWidget}. */
 function getTrendIcon(trend: KPITrend): React.ReactNode {
   switch (trend) {
     case "up":
@@ -111,6 +156,32 @@ function getTrendIcon(trend: KPITrend): React.ReactNode {
 // KPIWidget Component
 // ============================================================
 
+/**
+ * Displays a single formatted metric with an optional trend indicator,
+ * wrapped in a {@link DashboardCard} (`type="kpi"`). Trend direction and
+ * label are auto-calculated from `value`/`previousValue` when not explicitly
+ * overridden via `trend`/`trendLabel`.
+ *
+ * @returns A {@link DashboardCard} showing the formatted value, label, and (if applicable) a colored trend row.
+ *
+ * @example
+ * ```tsx
+ * import { KPIWidget } from "@dashcraft/core";
+ *
+ * <KPIWidget
+ *   id="mrr"
+ *   title="Monthly Recurring Revenue"
+ *   label="MRR"
+ *   value={48200}
+ *   previousValue={43000}
+ *   format="currency"
+ *   currency="USD"
+ *   decimals={0}
+ * />
+ * ```
+ *
+ * @see {@link RechartsWidget}, {@link HierarchyWidget}
+ */
 export const KPIWidget = React.memo(function KPIWidget({
   value,
   label,
@@ -122,7 +193,7 @@ export const KPIWidget = React.memo(function KPIWidget({
   trendLabel,
   icon,
   valueColor,
-  showBackground = true,
+  showBackground = false,
   ...cardProps
 }: KPIWidgetProps): React.JSX.Element {
   // ==========================================================
@@ -147,18 +218,18 @@ export const KPIWidget = React.memo(function KPIWidget({
     <DashboardCard {...cardProps} type="kpi">
       <div
         className={`
-          w-full h-full flex flex-col items-center justify-center p-4
+          w-full h-full flex flex-col items-center justify-center p-4 rounded-lg
           ${showBackground ? "bg-gradient-to-br from-white to-gray-50" : ""}
         `}
       >
         {/* Icon */}
         {icon && (
-          <div className="mb-2 text-gray-400">
+          <div className="mb-2 opacity-50">
             {icon}
           </div>
         )}
 
-        {/* Value */}
+        {/* Value — inherits the consumer theme's text color unless overridden */}
         <div
           className="text-3xl font-bold tracking-tight"
           style={{ color: valueColor }}
@@ -167,7 +238,7 @@ export const KPIWidget = React.memo(function KPIWidget({
         </div>
 
         {/* Label */}
-        <div className="mt-1 text-sm text-gray-500 font-medium">
+        <div className="mt-1 text-sm font-medium opacity-60">
           {label}
         </div>
 

@@ -18,14 +18,14 @@ const NAV = [
       { href: "/docs/components#dashboardcard", label: "DashboardCard" },
       { href: "/docs/components#kpiwidget", label: "KPIWidget" },
       { href: "/docs/components#rechartswidget", label: "RechartsWidget" },
-      { href: "/docs/components#nivowidget", label: "NivoWidget" },
+      { href: "/docs/components#hierarchywidget", label: "HierarchyWidget" },
     ],
   },
   {
     group: "Hooks",
     links: [
       { href: "/docs/hooks#useDashboard", label: "useDashboard" },
-      { href: "/docs/hooks#useWidgetData", label: "useWidgetData" },
+      { href: "/docs/hooks#usePersistedState", label: "usePersistedState" },
       { href: "/docs/hooks#useWidgetEvents", label: "useWidgetEvents" },
       { href: "/docs/hooks#usePersistence", label: "usePersistence" },
       { href: "/docs/hooks#useDraggable", label: "useDraggable" },

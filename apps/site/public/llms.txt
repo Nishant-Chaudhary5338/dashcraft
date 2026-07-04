@@ -1,18 +1,36 @@
 # dashcraft
 
-> Headless React dashboard library with boolean API, drag-and-drop, resizable widgets, and AI-native tooling.
+> Headless, MIT-licensed React dashboard library (`dashcraft-core`) with a boolean API, drag-and-drop, resizable widgets, and a built-in MCP server that turns a screenshot or a description into production-ready code you own. Ship the dashboard, not the prototype.
+
+## What it is
+
+dashcraft is a React library for building admin panels, analytics dashboards, and internal tools. It provides the behaviour — layout, drag-and-drop, resizing, persistence, and widget state — while staying **headless**, so you bring your own styles. It ships with an MCP server (`dashcraft-mcp-codegen`) and an in-browser tool that convert a screenshot or a natural-language description into `dashcraft-core` TSX. Generated code is written into your own repository: no lock-in, no proprietary runtime, no hosted backend.
+
+## Who it's for
+
+React and TypeScript developers who need to build dashboards fast without adopting a styled kit or a closed platform — teams that want to own the code, match their own design system, and keep dashboards maintainable.
+
+## Key facts
+
+- **License:** MIT (free and open source, commercial use allowed).
+- **Package:** `dashcraft-core` on npm; React 18+ / React 19 compatible; written in TypeScript.
+- **Headless:** unstyled by default; you control all visuals with your own CSS or tokens.
+- **Boolean API:** interactive behaviours are boolean props, e.g. `<DashboardCard drag resize settings delete>`.
+- **Chart-agnostic:** `recharts` is an optional peer dependency, only needed for chart widgets.
+- **AI-native:** `dashcraft-mcp-codegen` MCP server analyzes screenshots and generates code and full Vite projects.
+- **Own your repo:** output is plain TSX committed to your codebase — no runtime lock-in.
+- **How it differs:** headless (unlike Tremor's styled kit), backed by a real component library for consistent output (unlike one-off v0 generations), and MIT open source in your own repo (unlike Retool's hosted, proprietary platform).
 
 ## Overview
 
-dashcraft (`@dashcraft/core`) is an MIT-licensed React library for building admin panels, analytics dashboards, and internal tools. It handles layout, drag-and-drop, resizing, persistence, and widget state — you bring your own styles.
+dashcraft (`dashcraft-core`) is an MIT-licensed React library for building admin panels, analytics dashboards, and internal tools. It handles layout, drag-and-drop, resizing, persistence, and widget state — you bring your own styles.
 
 ## Quick Install
 
 ```bash
-npm install @dashcraft/core
-# Optional chart peer deps
+npm install dashcraft-core
+# Optional chart peer dep (powers RechartsWidget + HierarchyWidget treemap & sunburst)
 npm install recharts
-npm install @nivo/core @nivo/bar @nivo/line @nivo/pie
 ```
 
 ## Core Concepts
@@ -20,8 +38,8 @@ npm install @nivo/core @nivo/bar @nivo/line @nivo/pie
 The API is intentionally minimal. Every interactive behaviour is a boolean prop on `DashboardCard`:
 
 ```tsx
-import { Dashboard, DashboardCard, KPIWidget, RechartsWidget } from '@dashcraft/core'
-import '@dashcraft/core/styles.css'
+import { Dashboard, DashboardCard, KPIWidget, RechartsWidget } from 'dashcraft-core'
+import 'dashcraft-core/styles.css'
 
 export function MyDashboard() {
   return (
@@ -92,15 +110,15 @@ Chart widget backed by recharts.
 | `xAxisKey` | `string` | Key for X-axis values |
 | `title` | `string` | Widget title |
 
-### `<NivoWidget>`
-Chart widget backed by @nivo.
+### `<HierarchyWidget>`
+recharts-backed treemap & sunburst, plus a built-in dependency-free heatmap.
 
 | Prop | Type | Description |
 |------|------|-------------|
 | `chartType` | `"heatmap" \| "treemap" \| "sunburst"` | Chart type |
-| `data` | `object[]` | Nivo-compatible data |
+| `data` | `object[]` | Chart data for the selected type |
 | `title` | `string` | Widget title |
-| `colorScheme` | `string` | Nivo color scheme |
+| `colors` | `string[]` | Optional color palette |
 
 ## Hooks
 
@@ -113,21 +131,45 @@ Chart widget backed by @nivo.
 
 ## MCP Server
 
-For AI-assisted dashboard generation, use `@dashcraft/mcp-codegen`:
+For AI-assisted dashboard generation, use `dashcraft-mcp-codegen`:
 
 ```bash
-npm install -g @dashcraft/mcp-codegen
+npm install -g dashcraft-mcp-codegen
 ```
 
 Tools available:
-- `analyze_dashboard` — Analyze a screenshot and map widgets to @dashcraft/core components
+- `analyze_dashboard` — Analyze a screenshot and map widgets to dashcraft-core components
 - `generate_code` — Generate TSX code from widget configuration
 - `generate_project` — Generate a complete Vite project as a base64 zip
 
-## Links
+## Docs
 
-- Docs: https://dashcraft.digitribe.world/docs
-- Playground: https://dashcraft.digitribe.world/playground
-- GitHub: https://github.com/nishant-chaudhary/dashcraft
-- npm: https://npmjs.com/package/@dashcraft/core
-- AGENTS.md: https://dashcraft.digitribe.world/AGENTS.md
+- [Documentation](https://dashcraft.digitribe.world/docs): Full guide index for `dashcraft-core`.
+- [Installation](https://dashcraft.digitribe.world/docs/installation): Install `dashcraft-core` and the optional recharts peer dependency.
+- [Components](https://dashcraft.digitribe.world/docs/components): Dashboard, DashboardCard, KPIWidget, RechartsWidget, HierarchyWidget.
+- [Hooks](https://dashcraft.digitribe.world/docs/hooks): useDashboard, usePersistence, useWidgetData, and more.
+- [API reference](https://dashcraft.digitribe.world/docs/api): Full prop and type reference.
+- [Guide: Edit mode](https://dashcraft.digitribe.world/docs/guides/edit-mode): Toggle drag/resize editing at runtime.
+- [Guide: Persistence](https://dashcraft.digitribe.world/docs/guides/persistence): Persist layouts to localStorage.
+- [Guide: MCP](https://dashcraft.digitribe.world/docs/guides/mcp): Use the MCP server for AI-assisted codegen.
+
+## Playground
+
+- [Playground](https://dashcraft.digitribe.world/playground): Build a dashboard in the browser and export production-ready code you own.
+
+## Templates
+
+- [Templates](https://dashcraft.digitribe.world/showcase): Prebuilt dashboards you can open in the playground, restyle live, and export as a full Vite project.
+
+## MCP / AI
+
+- [MCP guide](https://dashcraft.digitribe.world/docs/guides/mcp): Screenshot-to-code and description-to-code via `dashcraft-mcp-codegen` (tools: analyze_dashboard, generate_code, generate_project).
+- [AGENTS.md](https://dashcraft.digitribe.world/AGENTS.md): How AI agents should work with the dashcraft ecosystem.
+
+## npm
+
+- [dashcraft-core](https://www.npmjs.com/package/dashcraft-core): The React library. `npm install dashcraft-core`.
+
+## GitHub
+
+- [Source repository](https://github.com/Nishant-Chaudhary5338/dashcraft): MIT-licensed monorepo (library, site, MCP codegen).

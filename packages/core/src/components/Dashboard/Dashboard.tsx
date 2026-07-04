@@ -9,11 +9,61 @@ import { useDashboardStore } from "../../store";
 // Dashboard Component (Context Provider)
 // ============================================================
 
+/**
+ * Props for {@link Dashboard}. Extends {@link DashboardConfig} (which supplies `persistenceKey`,
+ * `autoSave`, `autoSaveDelay`, `defaultEditMode`, `onLayoutChange`, `onEditModeChange`, `style`,
+ * and `children`) and adds a container `className`.
+ *
+ * @see {@link DashboardConfig} for the inherited configuration fields and their defaults.
+ */
 export interface DashboardProps extends DashboardConfig {
-  /** CSS class for the container (e.g., "grid grid-cols-3 gap-4") */
+  /**
+   * CSS class for the container element. In view mode (no dragged positions yet) the container uses
+   * normal document flow, so a grid/flex class here lays widgets out automatically, e.g.
+   * `"grid grid-cols-3 gap-4"`. Once widgets have saved absolute positions the container switches to
+   * `position: relative` with a computed min-height.
+   */
   className?: string;
 }
 
+/**
+ * The root provider and layout container for a DashCraft dashboard.
+ *
+ * Wrap a set of {@link DashboardCard}s in a `Dashboard` to give them shared edit-mode state, a
+ * drag-and-drop context, and (optionally) automatic persistence. In view mode the container lays
+ * children out with whatever `className` you pass (e.g. a CSS grid); entering edit mode captures
+ * each widget's on-screen position once, then switches to absolute positioning so cards can be
+ * dragged and resized freely. When `persistenceKey` is set, the layout is loaded on mount, saved on
+ * leaving edit mode and on unmount, and — with `autoSave` — debounced-saved on every change; an
+ * empty widget map is never allowed to overwrite a saved layout.
+ *
+ * @param props - see {@link DashboardProps}.
+ * @returns The dashboard container with its context and DnD providers.
+ *
+ * @example
+ * ```tsx
+ * import { Dashboard, DashboardCard } from "@dashcraft/core";
+ *
+ * function Home() {
+ *   return (
+ *     <Dashboard
+ *       persistenceKey="home"
+ *       autoSave
+ *       className="grid grid-cols-3 gap-4"
+ *       onEditModeChange={(editing) => console.log("edit mode:", editing)}
+ *     >
+ *       <DashboardCard id="a" title="A"><WidgetA /></DashboardCard>
+ *       <DashboardCard id="b" title="B"><WidgetB /></DashboardCard>
+ *     </Dashboard>
+ *   );
+ * }
+ * ```
+ *
+ * @see {@link DashboardCard} for the child widgets.
+ * @see {@link useDashboardContext} / {@link useDashboard} to drive edit mode from within.
+ * @see {@link useDashboardStore} for direct store access.
+ * @see {@link DashboardConfig} for all configuration props.
+ */
 const Dashboard = React.memo(function Dashboard({
   persistenceKey,
   autoSave = false,
@@ -310,7 +360,6 @@ const Dashboard = React.memo(function Dashboard({
 
   const handleDragStart = useCallback(
     (event: DragStartEvent) => {
-      console.log("[DEBUG] Dashboard: DRAG START triggered for widget:", event.active.id);
       // Bring widget to front when drag starts
       bringToFront(event.active.id as string);
     },

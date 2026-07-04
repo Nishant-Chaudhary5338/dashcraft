@@ -13,12 +13,12 @@ export { ScatterChartWidget } from "./recharts/charts/ScatterChartWidget";
 export { RadarChartWidget } from "./recharts/charts/RadarChartWidget";
 export { RadialBarChartWidget } from "./recharts/charts/RadialBarChartWidget";
 
-// Nivo Widgets
-export { NivoWidget } from "./nivo/NivoWidget";
-export type { NivoWidgetProps, NivoChartType, HeatmapRowData, TreemapDataNode, SunburstDataNode, NivoColorScheme } from "./nivo/nivo.types";
-export { HeatMapWidget } from "./nivo/charts/HeatMapWidget";
-export { TreemapWidget } from "./nivo/charts/TreemapWidget";
-export { SunburstWidget } from "./nivo/charts/SunburstWidget";
+// Hierarchy Widgets (treemap, sunburst, heatmap)
+export { HierarchyWidget } from "./hierarchy/HierarchyWidget";
+export type { HierarchyWidgetProps, HierarchyChartType, HeatmapRowData, TreemapDataNode, SunburstDataNode } from "./hierarchy/hierarchy.types";
+export { HeatMapWidget } from "./hierarchy/charts/HeatMapWidget";
+export { TreemapWidget } from "./hierarchy/charts/TreemapWidget";
+export { SunburstWidget } from "./hierarchy/charts/SunburstWidget";
 
 // KPI Widgets
 export { KPIWidget } from "./kpi/KPIWidget";

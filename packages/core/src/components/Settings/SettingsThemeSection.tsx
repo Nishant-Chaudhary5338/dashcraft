@@ -5,8 +5,13 @@ import type { WidgetTheme } from "../../types";
 // Props
 // ============================================================
 
+/**
+ * Props for {@link SettingsThemeSection}.
+ */
 export interface SettingsThemeSectionProps {
+  /** The theme currently applied to the widget (`"light" | "dark" | "custom"`). */
   currentTheme: WidgetTheme;
+  /** Called with the newly selected theme when the user clicks a theme button. */
   onThemeChange: (theme: WidgetTheme) => void;
 }
 
@@ -14,6 +19,7 @@ export interface SettingsThemeSectionProps {
 // Theme Options
 // ============================================================
 
+/** The three theme choices rendered as a segmented button group, in display order. */
 const THEME_OPTIONS: Array<{ value: WidgetTheme; label: string }> = [
   { value: "light", label: "Light" },
   { value: "dark", label: "Dark" },
@@ -24,6 +30,23 @@ const THEME_OPTIONS: Array<{ value: WidgetTheme; label: string }> = [
 // Component
 // ============================================================
 
+/**
+ * Settings section rendering a segmented button group for switching a
+ * widget between the built-in `"light"`/`"dark"` themes and `"custom"`
+ * (consumer-supplied) theming.
+ *
+ * @example
+ * ```tsx
+ * import { SettingsThemeSection } from "@dashcraft/core";
+ *
+ * <SettingsThemeSection
+ *   currentTheme={settings.theme ?? "light"}
+ *   onThemeChange={(theme) => updateSettings({ theme })}
+ * />
+ * ```
+ *
+ * @see {@link SettingsPanel} for the container that composes this section.
+ */
 export const SettingsThemeSection = React.memo(function SettingsThemeSection({
   currentTheme,
   onThemeChange,

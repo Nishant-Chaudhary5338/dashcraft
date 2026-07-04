@@ -41,7 +41,7 @@ const TABS = [
   {
     id: "edit",
     label: "Edit Mode",
-    code: `import { useDashboard } from '@dashcraft/core'
+    code: `import { useDashboard } from 'dashcraft-core'
 
 function EditToggle() {
   const { isEditMode, toggleEditMode } = useDashboard()
@@ -71,7 +71,7 @@ function EditToggle() {
   {
     id: "http",
     label: "Live Data",
-    code: `import { useWidgetData } from '@dashcraft/core'
+    code: `import { useWidgetData } from 'dashcraft-core'
 
 function LiveRevenueCard() {
   const { data, loading, error, refetch } = useWidgetData({

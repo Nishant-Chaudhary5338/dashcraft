@@ -27,7 +27,7 @@ dashcraft is a client-side React library. The main security considerations are:
 
 ## Out of Scope
 
-- Vulnerabilities in peer dependencies (recharts, @nivo, @dnd-kit) — report those to their maintainers
+- Vulnerabilities in peer dependencies (recharts, @dnd-kit) — report those to their maintainers
 - The playground's `/api/analyze` route requires a server-side `ANTHROPIC_API_KEY` — users are responsible for securing their own deployment
 
 ## Disclosure Policy

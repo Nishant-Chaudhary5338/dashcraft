@@ -6,11 +6,38 @@ import type { ResponsiveConfig, ResponsiveReturn } from "../types";
 // ============================================================
 
 /**
- * Hook to handle responsive content based on container width.
- * Returns the appropriate component for the current breakpoint.
+ * Renders different content per container width, using a `ResizeObserver`
+ * on a container element rather than the viewport — so it works correctly
+ * inside a dashboard widget whose available width depends on its grid
+ * cell, not the browser window.
  *
- * @param config - Configuration with breakpoints and initial content
- * @returns Object with content, current breakpoint, and container ref
+ * Attach the returned `containerRef` to the element whose width should
+ * drive content selection. `breakpoints` are numeric minimum widths (in
+ * pixels); the hook picks the largest breakpoint whose value is `<=` the
+ * container's current width, falling back to `breakpoints.initial` (or
+ * the `initial` config value) below the smallest breakpoint.
+ *
+ * @param config - Breakpoint map (`{ [minWidth]: content }`) plus the
+ * fallback `initial` content shown before measurement / below the
+ * smallest breakpoint. See {@link ResponsiveConfig}.
+ * @returns The content to render for the current width, the matched
+ * breakpoint key (or `"initial"`), and the ref to attach to the
+ * container. See {@link ResponsiveReturn}.
+ *
+ * @example
+ * ```tsx
+ * import { useResponsive } from "@dashcraft/core";
+ *
+ * function AdaptiveWidget() {
+ *   const { content, containerRef } = useResponsive({
+ *     initial: <CompactView />,
+ *     breakpoints: { 400: <MediumView />, 800: <FullView /> },
+ *   });
+ *   return <div ref={containerRef}>{content}</div>;
+ * }
+ * ```
+ *
+ * @see {@link useMeasure} for raw width/height without the breakpoint mapping.
  */
 export function useResponsive(config: ResponsiveConfig): ResponsiveReturn {
   const { breakpoints, initial } = config;

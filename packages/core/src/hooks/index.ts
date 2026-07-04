@@ -25,3 +25,9 @@ export type { UsePersistenceOptions, UsePersistenceReturn } from "./usePersisten
 export { useStateWithHistory } from "./useStateWithHistory";
 export type { StateWithHistory, UseStateWithHistoryOptions } from "./useStateWithHistory";
 
+export { useMeasure, useMeasureWidth } from "./useMeasure";
+export type { ElementSize } from "./useMeasure";
+
+export { useTabs } from "./useTabs";
+export type { UseTabsReturn } from "./useTabs";
+

@@ -1,24 +1,19 @@
 "use client";
 import Link from "next/link";
+import { Logo } from "@/components/ui/Logo";
 
 export function Footer() {
   return (
     <footer className="footer">
       <div className="container">
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "40px", marginBottom: "40px" }}>
+        <div className="footer-grid" style={{ display: "grid", gap: "40px", marginBottom: "40px" }}>
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
-              <span style={{ display: "grid", gridTemplateColumns: "repeat(3,5px)", gridTemplateRows: "repeat(3,5px)", gap: "3px" }}>
-                {Array.from({ length: 9 }).map((_, i) => (
-                  <span key={i} style={{ width: 5, height: 5, borderRadius: 1, background: "var(--accent)" }} />
-                ))}
-              </span>
-              <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1rem", letterSpacing: "-0.02em" }}>
-                dashcraft
-              </span>
+            <div style={{ marginBottom: "12px" }}>
+              <Logo size={24} />
             </div>
             <p style={{ fontSize: "0.875rem", color: "var(--text-muted)", lineHeight: 1.65, margin: 0 }}>
-              The headless React dashboard library. Boolean API. Your styles.
+              Screenshot in. Shippable dashboard out. Headless, drag-and-drop,
+              and yours to keep.
             </p>
           </div>
 
@@ -46,10 +41,10 @@ export function Footer() {
               Open Source
             </p>
             {[
-              ["GitHub", "https://github.com/nishant-chaudhary/dashcraft"],
-              ["npm", "https://npmjs.com/package/@dashcraft/core"],
-              ["Report a Bug", "https://github.com/nishant-chaudhary/dashcraft/issues"],
-              ["Contributing", "https://github.com/nishant-chaudhary/dashcraft/blob/main/CONTRIBUTING.md"],
+              ["GitHub", "https://github.com/Nishant-Chaudhary5338/dashcraft"],
+              ["npm", "https://npmjs.com/package/dashcraft-core"],
+              ["Report a Bug", "https://github.com/Nishant-Chaudhary5338/dashcraft/issues"],
+              ["Contributing", "https://github.com/Nishant-Chaudhary5338/dashcraft/blob/main/CONTRIBUTING.md"],
             ].map(([label, href]) => (
               <a key={label} href={href} target="_blank" rel="noopener noreferrer"
                 style={{ display: "block", fontSize: "0.875rem", color: "var(--text-secondary)", textDecoration: "none", padding: "4px 0", transition: "color 0.15s" }}
@@ -66,9 +61,9 @@ export function Footer() {
               AI Tools
             </p>
             {[
-              ["MCP Codegen Server", "https://npmjs.com/package/@dashcraft/mcp-codegen"],
+              ["MCP Codegen Server", "https://npmjs.com/package/dashcraft-mcp-codegen"],
               ["llms.txt", "https://dashcraft.digitribe.world/llms.txt"],
-              ["AGENTS.md", "https://github.com/nishant-chaudhary/dashcraft/blob/main/AGENTS.md"],
+              ["AGENTS.md", "https://github.com/Nishant-Chaudhary5338/dashcraft/blob/main/AGENTS.md"],
             ].map(([label, href]) => (
               <a key={label} href={href} target="_blank" rel="noopener noreferrer"
                 style={{ display: "block", fontSize: "0.875rem", color: "var(--text-secondary)", textDecoration: "none", padding: "4px 0", transition: "color 0.15s" }}
@@ -81,7 +76,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div style={{ borderTop: "1px solid var(--border)", paddingTop: "24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ borderTop: "1px solid var(--border)", paddingTop: "24px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
           <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", margin: 0 }}>
             MIT License · Made with care by{" "}
             <a href="https://digitribe.world" target="_blank" rel="noopener noreferrer"
@@ -90,7 +85,7 @@ export function Footer() {
             </a>
           </p>
           <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)", margin: 0 }}>
-            @dashcraft/core v0.1.0
+            dashcraft-core v0.1.0
           </p>
         </div>
       </div>

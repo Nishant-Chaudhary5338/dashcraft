@@ -15,6 +15,26 @@ import type { ChartComponentProps } from "../recharts.types";
 // BarChartWidget Component
 // ============================================================
 
+/**
+ * Renders a recharts `<BarChart>` from a resolved {@link ChartComponentProps}
+ * contract — one `<Bar>` per series, stacked when series share a `stackId`.
+ * Used internally by {@link RechartsWidget} when `chartType="bar"`; rarely
+ * imported directly since it expects already-enriched series (colors/names
+ * resolved) rather than the raw {@link SeriesConfig} array.
+ *
+ * @param props - {@link ChartComponentProps}. `customTooltip` is accepted but currently unused (not yet wired to recharts' `<Tooltip content>`).
+ * @returns A `ResponsiveContainer`-wrapped recharts bar chart.
+ *
+ * @example
+ * ```tsx
+ * import { RechartsWidget } from "@dashcraft/core";
+ *
+ * // Prefer going through RechartsWidget so series get default colors/names:
+ * <RechartsWidget chartType="bar" id="sales" title="Sales" data={data} series={series} />
+ * ```
+ *
+ * @see {@link RechartsWidget}
+ */
 export const BarChartWidget = React.memo(function BarChartWidget({
   data,
   series,

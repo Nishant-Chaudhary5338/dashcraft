@@ -16,13 +16,19 @@ import { SettingsCustomFields } from "./SettingsCustomFields";
 // Props
 // ============================================================
 
+/**
+ * Props for {@link SettingsPanel}.
+ */
 export interface SettingsPanelProps {
+  /** Widget instance id. Used to scope updates via `updateWidgetSettings(id, patch)` from {@link useDashboardContext}. */
   id: string;
+  /** The widget's current settings; seeds the panel's local draft state and is re-synced whenever it changes while the panel is closed. */
   settings: WidgetSettings;
   /** Element that opens the popover (must be a DOM element or use forwardRef) */
   trigger: React.ReactNode;
   /** Optional custom panel content — replaces the default settings sections when provided */
   customContent?: React.ReactNode;
+  /** Called with the full merged settings object after every committed change (theme, highlight, endpoint blur, polling, behavior, custom fields, etc). */
   onSettingsChange?: (settings: WidgetSettings) => void;
 }
 
@@ -36,7 +42,7 @@ const popoverVariants = {
     opacity: 1,
     scale: 1,
     y: 0,
-    transition: { type: "spring", stiffness: 400, damping: 25 },
+    transition: { type: "spring" as const, stiffness: 400, damping: 25 },
   },
   exit: {
     opacity: 0,
@@ -50,6 +56,32 @@ const popoverVariants = {
 // Component
 // ============================================================
 
+/**
+ * Radix Popover that hosts every built-in widget-settings section (theme,
+ * highlight border, endpoint, HTTP method, polling interval, behavior, and
+ * widget-defined custom fields) and syncs edits back to the dashboard store.
+ *
+ * Settings are edited in local draft state and flushed to
+ * `useDashboardContext().updateWidgetSettings` either immediately (most
+ * controls) or on blur (text/color inputs, to avoid flooding the store on
+ * every keystroke/drag). Pass {@link SettingsPanelProps.customContent} to
+ * replace the entire default section stack with bespoke UI while keeping the
+ * popover chrome (header, animation, positioning).
+ *
+ * @example
+ * ```tsx
+ * import { SettingsPanel } from "@dashcraft/core";
+ *
+ * <SettingsPanel
+ *   id={widget.id}
+ *   settings={widget.settings}
+ *   trigger={<button aria-label="Widget settings">⚙️</button>}
+ *   onSettingsChange={(settings) => console.log("settings updated", settings)}
+ * />
+ * ```
+ *
+ * @see {@link SettingsThemeSection}, {@link SettingsHighlightSection}, {@link SettingsEndpointSection}, {@link SettingsPollingSection}, {@link SettingsCustomFields}
+ */
 export const SettingsPanel = React.memo(function SettingsPanel({
   id,
   settings,

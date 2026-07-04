@@ -15,6 +15,23 @@ import type { ChartComponentProps } from "../recharts.types";
 // AreaChartWidget Component
 // ============================================================
 
+/**
+ * Renders a recharts `<AreaChart>` — one monotone `<Area>` per series, filled
+ * at 30% opacity of the series color. Used internally by {@link RechartsWidget}
+ * when `chartType="area"`.
+ *
+ * @param props - {@link ChartComponentProps}.
+ * @returns A `ResponsiveContainer`-wrapped recharts area chart.
+ *
+ * @example
+ * ```tsx
+ * import { RechartsWidget } from "@dashcraft/core";
+ *
+ * <RechartsWidget chartType="area" id="traffic" title="Traffic" data={data} series={series} />
+ * ```
+ *
+ * @see {@link RechartsWidget}
+ */
 export const AreaChartWidget = React.memo(function AreaChartWidget({
   data,
   series,

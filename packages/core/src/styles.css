@@ -1,4 +1,42 @@
 @import "tailwindcss";
-@import "@repo/tailwind-config";
+@source "../src/**/*.{ts,tsx}";
 
 /* DashCraft Widget Styles */
+
+/* ============================================================
+   Card edit-mode toolbar chrome.
+   Colors are theme-overridable via --dc-toolbar-* variables;
+   the fallbacks reproduce the default light look so existing
+   consumers see no change until they opt into theming.
+   ============================================================ */
+.dc-toolbar {
+  background: var(--dc-toolbar-bg, rgb(241 245 249 / 0.9));
+  border-bottom: 1px solid var(--dc-toolbar-border, rgb(226 232 240 / 0.7));
+}
+.dc-toolbar-btn { color: var(--dc-toolbar-fg, #64748b); }
+.dc-toolbar-btn:hover {
+  color: var(--dc-toolbar-fg-strong, #1e293b);
+  background: var(--dc-toolbar-hover, rgb(226 232 240 / 0.8));
+}
+.dc-toolbar-accent { color: var(--dc-toolbar-accent, #6366f1); }
+.dc-toolbar-accent:hover {
+  color: var(--dc-toolbar-accent-strong, #4338ca);
+  background: var(--dc-toolbar-accent-bg, rgb(238 242 255 / 0.8));
+}
+.dc-toolbar-del { color: var(--dc-toolbar-del, #f87171); }
+.dc-toolbar-del:hover {
+  color: var(--dc-toolbar-del-strong, #dc2626);
+  background: var(--dc-toolbar-del-bg, rgb(254 226 226 / 0.8));
+}
+.dc-toolbar-sep-r { border-right: 1px solid var(--dc-toolbar-border, rgb(226 232 240 / 0.7)); }
+.dc-toolbar-sep-l { border-left: 1px solid var(--dc-toolbar-border, rgb(226 232 240 / 0.7)); }
+.dc-view-gear {
+  background: var(--dc-toolbar-bg, #f1f5f9);
+  border: 1px solid var(--dc-toolbar-border, #cbd5e1);
+  color: var(--dc-toolbar-fg, #475569);
+}
+.dc-view-gear:hover {
+  background: var(--dc-toolbar-hover, #e2e8f0);
+  color: var(--dc-toolbar-fg-strong, #1e293b);
+  border-color: var(--dc-toolbar-border-strong, #94a3b8);
+}

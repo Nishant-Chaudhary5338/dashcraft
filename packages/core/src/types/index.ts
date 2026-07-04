@@ -2,6 +2,20 @@
 // DashCraft Type System - Central Exports
 // ============================================================
 
+/**
+ * This module is the single public entry point for every type and value
+ * exported from `@dashcraft/core`'s type system. Each `export *` re-exports
+ * the full contents of one modular `*.types.ts` file (grouped by concern —
+ * position, widget, settings, breakpoints, HTTP, persistence, animation,
+ * dashboard, agentic schema, and generic utilities).
+ *
+ * The additional named re-exports below the `export *` lines exist purely
+ * to make the package's intended public surface explicit and to guard
+ * against silent name collisions between modules (TypeScript errors on
+ * `export *` ambiguity, so re-exporting explicitly here documents intent
+ * even when there is currently no clash).
+ */
+
 // Re-export from modular type files
 export * from "./position.types";
 export * from "./widget.types";

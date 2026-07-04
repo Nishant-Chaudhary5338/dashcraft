@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 
 const SYSTEM_PROMPT = `You are a UI analysis expert specializing in dashboard components.
-Analyze dashboard images and map widgets to @dashcraft/core React components.`;
+Analyze dashboard images and map widgets to dashcraft-core React components.`;
 
 const USER_PROMPT = `Analyze this dashboard image. Identify every distinct widget or panel.
 
@@ -10,8 +10,8 @@ For each widget, determine:
 1. Type: kpi, bar_chart, line_chart, area_chart, pie_chart, scatter_chart, radar_chart, heatmap, treemap, sunburst
 2. Title (from visible text, or infer from content)
 3. Grid position (12-column grid): colStart (1-12), colSpan (1-12), rowStart, rowSpan
-4. Component: KPIWidget for metrics/KPIs, RechartsWidget for most charts, NivoWidget for heatmap/treemap/sunburst
-5. Config: format (currency/percent/number for KPI), colorScheme (for nivo)
+4. Component: KPIWidget for metrics/KPIs, RechartsWidget for most charts, HierarchyWidget for heatmap/treemap/sunburst
+5. Config: format (currency/percent/number for KPI)
 
 Return ONLY valid JSON with no markdown fences:
 {
@@ -40,18 +40,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "imageBase64 required" }, { status: 400 });
     }
 
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    // Bring-your-own-key: the visitor supplies their own Anthropic key (sent
+    // per-request via header, never stored server-side). Fall back to a server
+    // key only if one is configured for local/self-hosting.
+    const apiKey =
+      req.headers.get("x-anthropic-key")?.trim() || process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "ANTHROPIC_API_KEY not configured on server" },
-        { status: 503 }
+        { error: "MISSING_KEY", message: "Add your Anthropic API key to use AI import." },
+        { status: 401 }
       );
     }
 
     const client = new Anthropic({ apiKey });
 
     const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
+      model: "claude-sonnet-5",
       max_tokens: 2048,
       system: SYSTEM_PROMPT,
       messages: [

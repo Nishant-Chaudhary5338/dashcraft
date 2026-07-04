@@ -4,20 +4,52 @@ import React, { useState, useCallback } from "react";
 // Props
 // ============================================================
 
+/**
+ * Props for {@link SettingsEndpointSection}.
+ */
 export interface SettingsEndpointSectionProps {
+  /** Current endpoint URL. Empty string means "no endpoint selected". */
   endpoint: string;
-  /** Predefined endpoint URLs to show in the select. Defaults to empty. */
+  /** Predefined endpoint URLs to show in the select.
+   * @default [] */
   endpointOptions?: string[];
+  /** Called on every keystroke in the custom-URL input, and whenever the select value changes. */
   onChange: (endpoint: string) => void;
+  /** Called when the custom-URL input loses focus — use this to flush the value to persistent state. */
   onBlur?: () => void;
 }
 
+/** Sentinel `<option>` value that switches the select into "custom URL" input mode. Never sent to `onChange` as a real endpoint. */
 const CUSTOM_SENTINEL = "__custom__";
 
 // ============================================================
 // Component
 // ============================================================
 
+/**
+ * Settings section for choosing a widget's data endpoint: either one of a
+ * predefined list ({@link SettingsEndpointSectionProps.endpointOptions}) or a
+ * free-text custom URL.
+ *
+ * Selecting "Custom URL…" (or having an `endpoint` value that isn't in
+ * `endpointOptions`) reveals a text input; the select and input are kept in
+ * sync so re-opening the panel with a pre-existing custom endpoint shows the
+ * input immediately.
+ *
+ * @example
+ * ```tsx
+ * import { SettingsEndpointSection } from "@dashcraft/core";
+ *
+ * <SettingsEndpointSection
+ *   endpoint={settings.endpoint ?? ""}
+ *   endpointOptions={["https://api.example.com/sales", "https://api.example.com/users"]}
+ *   onChange={(endpoint) => setLocalEndpoint(endpoint)}
+ *   onBlur={() => persistEndpoint()}
+ * />
+ * ```
+ *
+ * @see {@link SettingsPanel} for the container that composes this section.
+ */
 export const SettingsEndpointSection = React.memo(
   function SettingsEndpointSection({
     endpoint,

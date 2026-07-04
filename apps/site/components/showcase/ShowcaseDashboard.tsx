@@ -1,6 +1,6 @@
 "use client";
 /**
- * ShowcaseDashboard — renders a single preset using the actual @dashcraft/core library.
+ * ShowcaseDashboard — renders a single preset using the actual dashcraft-core library.
  *
  * Architecture notes:
  * - KPIWidget and RechartsWidget both extend DashboardCardProps and render their own
@@ -13,10 +13,10 @@
  * <ShowcaseDashboard preset={PRESETS.analytics} editMode={false} onDelete={(id) => {}} />
  */
 
-import "@dashcraft/core/styles.css";
-import { Dashboard } from "@dashcraft/core";
-import { KPIWidget } from "@dashcraft/core/widgets/kpi";
-import { RechartsWidget } from "@dashcraft/core/widgets/recharts";
+import "dashcraft-core/styles.css";
+import { Dashboard } from "dashcraft-core";
+import { KPIWidget } from "dashcraft-core/widgets/kpi";
+import { RechartsWidget } from "dashcraft-core/widgets/recharts";
 import type { Preset, ShowcaseKPI, ShowcaseChart } from "./presets";
 
 interface Props {
@@ -50,9 +50,9 @@ function ChartCard({ w, editMode, onDelete }: { w: ShowcaseChart; editMode: bool
     <RechartsWidget
       id={w.id}
       title={w.title}
-      chartType={w.chartType as import("@dashcraft/core/widgets/recharts").RechartsWidgetProps["chartType"]}
-      data={w.data as import("@dashcraft/core/widgets/recharts").RechartsWidgetProps["data"]}
-      series={w.series as unknown as import("@dashcraft/core/widgets/recharts").RechartsWidgetProps["series"]}
+      chartType={w.chartType as import("dashcraft-core/widgets/recharts").RechartsWidgetProps["chartType"]}
+      data={w.data as import("dashcraft-core/widgets/recharts").RechartsWidgetProps["data"]}
+      series={w.series as unknown as import("dashcraft-core/widgets/recharts").RechartsWidgetProps["series"]}
       xAxisKey={w.xAxisKey}
       drag={editMode}
       resize={editMode}

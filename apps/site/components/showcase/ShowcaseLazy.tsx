@@ -2,7 +2,7 @@
 /**
  * SSR-safe wrapper for ShowcaseClient.
  *
- * @dashcraft/core uses browser-only APIs (document.addEventListener, localStorage).
+ * dashcraft-core uses browser-only APIs (document.addEventListener, localStorage).
  * Dynamic import with ssr:false ensures it only runs in the browser.
  */
 import dynamic from "next/dynamic";

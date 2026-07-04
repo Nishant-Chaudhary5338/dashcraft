@@ -15,10 +15,10 @@ cd dashcraft
 pnpm install
 
 # 3. Build the core library
-pnpm --filter @dashcraft/core build
+pnpm --filter dashcraft-core build
 
 # 4. Run tests
-pnpm --filter @dashcraft/core test
+pnpm --filter dashcraft-core test
 
 # 5. Start the product site
 pnpm --filter @dashcraft/site dev
@@ -110,8 +110,8 @@ These apply to all contributions:
 
 Before opening a PR, confirm:
 
-- [ ] `pnpm --filter @dashcraft/core build` passes (0 TypeScript errors)
-- [ ] `pnpm --filter @dashcraft/core test` passes
+- [ ] `pnpm --filter dashcraft-core build` passes (0 TypeScript errors)
+- [ ] `pnpm --filter dashcraft-core test` passes
 - [ ] If new component/hook: docs page updated in `apps/site/`
 - [ ] If new widget type: added to playground palette
 - [ ] No committed `.env` files or API keys
@@ -137,7 +137,7 @@ Use the [bug report template](.github/ISSUE_TEMPLATE/bug_report.md). Include:
 - Which component or hook is affected
 - Minimal reproduction (StackBlitz or code snippet)
 - Expected vs actual behaviour
-- Node version, React version, @dashcraft/core version
+- Node version, React version, dashcraft-core version
 
 ---
 

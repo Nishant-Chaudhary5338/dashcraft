@@ -7,7 +7,10 @@ import { useDashboardStore } from "../store";
 // ============================================================
 
 /**
- * Resize handle position
+ * Identifies which edge or corner handle of a resizable box is being
+ * dragged. Cardinal values (`"top"`, `"right"`, `"bottom"`, `"left"`)
+ * resize one dimension only; corner values resize both width and height
+ * simultaneously.
  */
 export type ResizeHandle =
   | "top"
@@ -20,28 +23,40 @@ export type ResizeHandle =
   | "topLeft";
 
 /**
- * Resize delta information
+ * Change in width/height produced by a single resize move, relative to the
+ * size at the start of the current drag (not the previous frame).
  */
 export interface ResizeDelta {
+  /** Change in width in pixels since the resize started. Can be negative. */
   width: number;
+  /** Change in height in pixels since the resize started. Can be negative. */
   height: number;
 }
 
 /**
- * Position delta information
+ * Offset a resizable container must shift by to keep the opposite edge
+ * anchored when resizing from a `left`/`top`-inclusive handle (e.g.
+ * dragging the left edge grows the box leftward, so the container's `x`
+ * must decrease by the same amount to keep the right edge fixed).
  */
 export interface PositionDelta {
+  /** Horizontal position adjustment in pixels; nonzero only for left-side handles. */
   x: number;
+  /** Vertical position adjustment in pixels; nonzero only for top-side handles. */
   y: number;
 }
 
 /**
- * Resize event information
+ * Snapshot passed to {@link UseResizeOptions.onResize} on every resize move.
  */
 export interface ResizeEvent {
+  /** The new (constrained) size after this move. */
   size: Size;
+  /** Size change since the resize gesture started. */
   delta: ResizeDelta;
+  /** Position compensation needed to keep the opposite edge anchored. */
   positionDelta: PositionDelta;
+  /** Which handle is being dragged. */
   handle: ResizeHandle;
 }
 
@@ -49,23 +64,48 @@ export interface ResizeEvent {
  * Options for useResize hook
  */
 export interface UseResizeOptions {
-  /** Initial size */
+  /**
+   * Starting size. Also used as the target when {@link UseResizeReturn.resetSize}
+   * is called, and re-applied automatically (while not resizing) if this
+   * value's width/height changes between renders.
+   */
   initialSize: Size;
-  /** Minimum size constraints */
+  /**
+   * Lower bound clamp applied to both dimensions on every resize.
+   *
+   * @default { width: 50, height: 50 }
+   */
   minSize?: Size;
-  /** Maximum size constraints */
+  /**
+   * Upper bound clamp applied to both dimensions on every resize.
+   *
+   * @default { width: Infinity, height: Infinity }
+   */
   maxSize?: Size;
-  /** Aspect ratio to maintain (width / height) */
+  /**
+   * When set, width/height are locked to this width-over-height ratio: if
+   * the dragged size would exceed the ratio, width is derived from height
+   * (or vice versa) so the ratio holds exactly. Applied after min/max
+   * clamping and before grid snapping.
+   */
   aspectRatio?: number;
-  /** Grid snap size */
+  /**
+   * When set, both dimensions are rounded to the nearest multiple of this
+   * value after min/max/aspect-ratio constraints are applied.
+   */
   gridSize?: number;
-  /** Callback when resize starts */
+  /** Fires once, synchronously, when a resize gesture begins (mouse/touch down on a handle). */
   onResizeStart?: (handle: ResizeHandle) => void;
-  /** Callback during resize */
+  /** Fires on every pointer move during an active resize, with the constrained size and deltas for that move. */
   onResize?: (event: ResizeEvent) => void;
-  /** Callback when resize ends */
+  /** Fires once when the resize gesture ends (mouse/touch up), with the final constrained size. */
   onResizeEnd?: (size: Size) => void;
-  /** Whether resizing is disabled */
+  /**
+   * When `true`, handle mouse/touch-down is ignored so the box can't be
+   * resized — existing size and handlers are otherwise unaffected.
+   *
+   * @default false
+   */
   disabled?: boolean;
 }
 
@@ -90,19 +130,26 @@ export interface UseResizeReturn {
 }
 
 /**
- * Props for resize handle elements
+ * Props returned by {@link UseResizeReturn.getHandleProps}, meant to be
+ * spread directly onto a handle `<div>` (or similar) element.
  */
 export interface ResizeHandleProps {
+  /** Starts the resize gesture on mouse down, unless `disabled`. */
   onMouseDown: (e: React.MouseEvent) => void;
+  /** Starts the resize gesture on touch start, unless `disabled`. */
   onTouchStart: (e: React.TouchEvent) => void;
+  /** Marks which edge/corner this handle represents (useful for styling/testing selectors). */
   "data-resize-handle": ResizeHandle;
+  /** Inline positioning + cursor styles pre-computed for this handle's position. */
   style: React.CSSProperties;
 }
 
 /**
- * Props for resizable container
+ * Props returned by {@link UseResizeReturn.getContainerProps}, meant to be
+ * spread directly onto the resizable container element.
  */
 export interface ResizeContainerProps {
+  /** `position: relative` plus the current width/height, so absolutely-positioned handles line up. */
   style: React.CSSProperties;
 }
 
@@ -131,6 +178,9 @@ export interface ResizeContainerProps {
  *   </div>
  * );
  * ```
+ *
+ * @see {@link useDraggable} for the companion drag hook.
+ * @see {@link useMeasure} if you only need to observe an element's size, not control it.
  */
 export function useResize(options: UseResizeOptions): UseResizeReturn {
   const {
@@ -285,7 +335,6 @@ export function useResize(options: UseResizeOptions): UseResizeReturn {
 
       const deltaX = clientX - startPosRef.current.x;
       const deltaY = clientY - startPosRef.current.y;
-      console.log("[DEBUG] handleMove: handle=", activeHandle, "delta=", deltaX, deltaY, "startPos=", startPosRef.current.x, startPosRef.current.y);
 
       const newSize = calculateNewSize(deltaX, deltaY, activeHandle);
       const constrainedSize = constrainSize(newSize);
@@ -401,7 +450,6 @@ export function useResize(options: UseResizeOptions): UseResizeReturn {
         setActiveHandle(handle);
         setIsResizing(true);
         useDashboardStore.getState().setIsResizing(true);
-        console.log("[DEBUG] useResize: RESIZE START, handle=", handle);
         onResizeStart?.(handle);
       };
 

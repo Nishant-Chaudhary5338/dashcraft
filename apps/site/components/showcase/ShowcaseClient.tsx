@@ -1,21 +1,6 @@
 "use client";
-/**
- * ShowcaseClient — interactive dashboard showcase with preset switcher.
- *
- * Features:
- * - 3 real-world preset dashboards using actual @dashcraft/core components
- * - Edit Mode toggle: enables drag, resize, delete on all cards
- * - Reset Layout: restores default widget positions via store resetLayout()
- * - Download Code: generates @dashcraft/core TSX via lib/codegen.ts
- * - Deleted widgets tracked in local state; restore-all on preset switch
- *
- * @example
- * // Used on /showcase page
- * import { ShowcaseClient } from "@/components/showcase/ShowcaseClient"
- * <ShowcaseClient />
- */
 
-import { useState, useCallback, useTransition, useEffect } from "react";
+import { useState, useCallback, useTransition } from "react";
 import { PRESETS, type PresetKey } from "./presets";
 import { ShowcaseDashboard } from "./ShowcaseDashboard";
 import { generateDashboardCode } from "@/lib/codegen";
@@ -28,19 +13,15 @@ const PRESET_KEYS = Object.keys(PRESETS) as PresetKey[];
 function presetToCodegen(presetKey: PresetKey, deletedIds: Set<string>): CodegenWidget[] {
   return PRESETS[presetKey].widgets
     .filter((w) => !deletedIds.has(w.id))
-    .map((w, i) => ({
+    .map((w) => ({
       id: w.id,
       type: w.kind === "kpi" ? "kpi" : (`${w.chartType}_chart` as CodegenWidget["type"]),
       title: w.title,
-      colStart: w.grid.colStart,
-      colSpan: w.grid.colSpan,
-      rowStart: w.grid.rowStart,
-      rowSpan: w.grid.rowSpan,
+      defaultPosition: w.defaultPosition,
+      defaultSize: w.defaultSize,
       drag: true, resize: true, settings: true, delete: true,
       config: {
-        format: w.kind === "kpi"
-          ? (w.format === "percentage" ? "percent" : w.format) as "currency" | "percent" | "number"
-          : undefined,
+        format: w.kind === "kpi" ? w.format : undefined,
         chartType: w.kind === "chart" ? w.chartType : undefined,
       },
     }));
@@ -53,12 +34,9 @@ export function ShowcaseClient() {
   const [codeOpen, setCodeOpen] = useState(false);
   const [, startTransition] = useTransition();
 
-  // Reset deleted widgets when switching presets
   const handlePresetSwitch = useCallback((key: PresetKey) => {
     startTransition(() => {
-      // Reset the global dashcraft store before switching so old widget
-      // positions don't bleed into the new preset's layout
-      import("@dashcraft/core/store").then(({ useDashboardStore }) => {
+      import("dashcraft-core/store").then(({ useDashboardStore }) => {
         useDashboardStore.getState().resetLayout();
         setPreset(key);
         setDeletedIds(new Set());
@@ -73,7 +51,7 @@ export function ShowcaseClient() {
   }, []);
 
   const handleReset = useCallback(() => {
-    import("@dashcraft/core/store").then(({ useDashboardStore }) => {
+    import("dashcraft-core/store").then(({ useDashboardStore }) => {
       useDashboardStore.getState().resetLayout();
       setDeletedIds(new Set());
     });
@@ -95,7 +73,7 @@ export function ShowcaseClient() {
     <div className="showcase-root">
       {/* ── Top Controls ─────────────────────────────── */}
       <div className="showcase-topbar">
-        {/* Preset Tabs */}
+        {/* Preset Tabs — left */}
         <div className="showcase-tabs">
           {PRESET_KEYS.map((key) => (
             <button
@@ -109,38 +87,40 @@ export function ShowcaseClient() {
           ))}
         </div>
 
-        {/* Actions */}
+        {/* Actions — right, clear hierarchy */}
         <div className="showcase-actions">
-          {deletedIds.size > 0 && (
-            <button className="showcase-btn ghost" onClick={handleReset}>
-              ↺ Restore All
+          {/* Tertiary: Reset — ghost text link, appears inline */}
+          {(deletedIds.size > 0) && (
+            <button className="showcase-btn ghost small" onClick={handleReset}>
+              ↺ Restore
             </button>
           )}
-          <button className="showcase-btn ghost" onClick={handleReset}>
-            Reset Layout
+          <button className="showcase-btn ghost small" onClick={handleReset}>
+            Reset
           </button>
+
+          {/* Primary: Edit Layout — the demo's superpower */}
           <button
-            className={`showcase-btn${editMode ? " active" : ""}`}
+            className={`showcase-btn${editMode ? " active" : " primary-outline"}`}
             onClick={() => setEditMode((v) => !v)}
           >
-            {editMode ? "✓ Done Editing" : "⊞ Edit Layout"}
+            {editMode ? "✓ Done" : "⊞ Edit Layout"}
           </button>
+
+          {/* Secondary: Get Code (view + download) */}
           <button className="showcase-btn accent" onClick={() => setCodeOpen((v) => !v)}>
-            {codeOpen ? "Hide Code" : "View Code"}
-          </button>
-          <button className="showcase-btn accent" onClick={handleDownload}>
-            ↓ Download
+            {codeOpen ? "Hide Code" : "Get Code ↓"}
           </button>
         </div>
       </div>
 
-      {/* ── Preset description ───────────────────────── */}
+      {/* ── Preset description bar ───────────────────── */}
       <div className="showcase-desc">
         <span className="showcase-desc-label">{currentPreset.label}</span>
         {" — "}
         {currentPreset.description}
         {editMode && (
-          <span className="showcase-edit-hint"> · Drag widgets to reposition. Resize from the corner. Click ✕ to delete.</span>
+          <span className="showcase-edit-hint"> · Drag to reposition · resize from corners · ✕ to delete</span>
         )}
         <span className="showcase-widget-count">{activeWidgets.length} widgets</span>
       </div>
@@ -148,7 +128,6 @@ export function ShowcaseClient() {
       {/* ── Dashboard Canvas ─────────────────────────── */}
       <div className="showcase-canvas-wrap">
         <div className="showcase-canvas-scroll">
-          {/* key changes on preset switch, forcing full unmount+remount */}
           <ShowcaseDashboard
             key={preset}
             preset={currentPreset}
@@ -162,13 +141,27 @@ export function ShowcaseClient() {
       <div className={`showcase-code-panel${codeOpen ? " open" : ""}`}>
         <div className="showcase-code-header">
           <span style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-            <span style={{ fontFamily: "var(--font-mono)", color: "var(--accent)" }}>src/Dashboard.tsx</span>
-            {" "}— copy into your project, replace <code>data={`{[]}`}</code> with real data
+            <span style={{ fontFamily: "var(--font-mono)", color: "var(--accent)" }}>
+              src/Dashboard.tsx
+            </span>
+            {" "}— replace{" "}
+            <code style={{ fontFamily: "var(--font-mono)", background: "var(--accent-subtle)", padding: "1px 5px", borderRadius: 3 }}>
+              data={`{[]}`}
+            </code>
+            {" "}with real data
           </span>
-          <div style={{ display: "flex", gap: 8 }}>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <CopyButton text={generatedCode} />
-            <button className="showcase-btn" onClick={handleDownload}>↓ Full Project ZIP</button>
-            <button className="showcase-btn ghost" onClick={() => setCodeOpen(false)}>✕</button>
+            <button className="showcase-btn small" onClick={handleDownload}>
+              ↓ Full Project ZIP
+            </button>
+            <button
+              className="showcase-btn ghost small"
+              onClick={() => setCodeOpen(false)}
+              aria-label="Close code panel"
+            >
+              ✕
+            </button>
           </div>
         </div>
         <pre className="showcase-code-pre"><code>{generatedCode}</code></pre>

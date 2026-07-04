@@ -5,10 +5,17 @@ import * as Switch from "@radix-ui/react-switch";
 // Props
 // ============================================================
 
+/**
+ * Props for {@link SettingsHighlightSection}.
+ */
 export interface SettingsHighlightSectionProps {
+  /** Whether the highlight border toggle is currently on. */
   isEnabled: boolean;
+  /** Current highlight color as a hex string (e.g. `"#3b82f6"`). Only shown/used while `isEnabled` is true. */
   color: string;
+  /** Called immediately when the Switch is toggled on/off. */
   onToggle: (checked: boolean) => void;
+  /** Called on blur of the color input with the committed hex value (not on every keystroke/drag). */
   onColorChange: (color: string) => void;
 }
 
@@ -16,6 +23,28 @@ export interface SettingsHighlightSectionProps {
 // Component
 // ============================================================
 
+/**
+ * Settings section that toggles a widget's highlight border on/off and lets
+ * the user pick its color via a native color input.
+ *
+ * The color value is buffered in local state ({@link SettingsHighlightSectionProps.color}
+ * is only committed on blur) so dragging the native color picker doesn't flood
+ * the dashboard store with intermediate values.
+ *
+ * @example
+ * ```tsx
+ * import { SettingsHighlightSection } from "@dashcraft/core";
+ *
+ * <SettingsHighlightSection
+ *   isEnabled={settings.highlight ?? false}
+ *   color={settings.highlightColor ?? "#3b82f6"}
+ *   onToggle={(highlight) => updateSettings({ highlight })}
+ *   onColorChange={(highlightColor) => updateSettings({ highlightColor })}
+ * />
+ * ```
+ *
+ * @see {@link SettingsPanel} for the container that composes this section.
+ */
 export const SettingsHighlightSection = React.memo(
   function SettingsHighlightSection({
     isEnabled,
@@ -76,4 +105,5 @@ export const SettingsHighlightSection = React.memo(
   }
 );
 
+/** @internal Enables React DevTools/agent tooling to show a readable component name through `React.memo`. */
 SettingsHighlightSection.displayName = "SettingsHighlightSection";

@@ -7,10 +7,42 @@ import type { HttpClientConfig, HttpClientReturn, HttpClientState } from "../typ
 
 /**
  * Built-in HTTP client hook for data fetching with polling support.
- * Provides loading, error, and data states with automatic refresh.
  *
- * @param config - Configuration with endpoint, method, polling, etc.
- * @returns Object with data, loading, error, refetch, and cancel
+ * Fetches `config.endpoint` on mount and whenever `endpoint`/`method`/
+ * `headers`/`body`/`enabled` change, tracking loading/error/data state
+ * across the request lifecycle. Cancels the in-flight request (via
+ * `AbortController`) whenever a new fetch starts or the hook unmounts, and
+ * silently ignores `AbortError` rather than surfacing it as `error`. When
+ * `pollingInterval` is set to a positive number, re-fetches on that
+ * interval as long as `enabled` is `true`; polling is not restarted for a
+ * config change alone — it depends on `pollingInterval`/`enabled`/the
+ * memoized `fetchData` callback.
+ *
+ * This shape lines up with {@link WidgetSettings} (`endpoint`, `method`,
+ * `headers`, `body`, `pollingInterval`), so a widget can drive its data
+ * fetching entirely from user-editable settings.
+ * @param config - Fetch configuration: `endpoint`, `method` (default
+ * `"GET"`), `headers`, `body`, `pollingInterval` (ms; disabled if `0` or
+ * omitted), and `enabled` (default `true`; set `false` to pause fetching).
+ * @returns Current `{ data, loading, error, lastFetched }` state plus
+ * `refetch()` (re-runs the fetch immediately) and `cancel()` (aborts the
+ * in-flight request and stops polling).
+ * @example
+ * ```tsx
+ * import { useWidgetData } from "@dashcraft/core";
+ *
+ * function MetricsWidget() {
+ *   const { data, loading, error, refetch } = useWidgetData<{ count: number }>({
+ *     endpoint: "/api/metrics/active-users",
+ *     pollingInterval: 30_000,
+ *   });
+ *
+ *   if (loading) return <span>Loading...</span>;
+ *   if (error) return <button onClick={refetch}>Retry</button>;
+ *   return <span>{data?.count}</span>;
+ * }
+ * ```
+ * @see WidgetSettings
  */
 export function useWidgetData<TData = unknown>(
   config: HttpClientConfig

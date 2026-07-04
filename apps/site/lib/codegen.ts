@@ -2,28 +2,27 @@ export interface WidgetConfig {
   id: string;
   type: "kpi" | "bar_chart" | "line_chart" | "area_chart" | "pie_chart" | "scatter_chart" | "radar_chart" | "heatmap" | "treemap" | "sunburst";
   title: string;
-  colStart: number;
-  colSpan: number;
-  rowStart: number;
-  rowSpan: number;
+  /** Pixel position on the canvas */
+  defaultPosition: { x: number; y: number };
+  /** Pixel size */
+  defaultSize: { width: number; height: number };
   drag: boolean;
   resize: boolean;
   settings: boolean;
   delete: boolean;
   config: {
-    format?: "currency" | "percent" | "number";
+    format?: "currency" | "percent" | "number" | "percentage";
     chartType?: string;
-    colorScheme?: string;
   };
 }
 
 const RECHARTS_TYPES = new Set(["bar_chart", "line_chart", "area_chart", "pie_chart", "scatter_chart", "radar_chart"]);
-const NIVO_TYPES = new Set(["heatmap", "treemap", "sunburst"]);
+const HIERARCHY_TYPES = new Set(["heatmap", "treemap", "sunburst"]);
 
 function getComponent(type: WidgetConfig["type"]) {
   if (type === "kpi") return "KPIWidget";
   if (RECHARTS_TYPES.has(type)) return "RechartsWidget";
-  if (NIVO_TYPES.has(type)) return "NivoWidget";
+  if (HIERARCHY_TYPES.has(type)) return "HierarchyWidget";
   return "KPIWidget";
 }
 
@@ -36,37 +35,57 @@ function boolProps(w: WidgetConfig): string {
   if (w.drag) parts.push("drag");
   if (w.resize) parts.push("resize");
   if (w.settings) parts.push("settings");
-  if (!w.delete) parts.push("delete={false}");
+  if (w.delete) parts.push("delete");
   return parts.length ? " " + parts.join(" ") : "";
 }
 
-function widgetJSX(w: WidgetConfig, indent = "      "): string {
+function formatProp(w: WidgetConfig): string {
+  const f = w.config.format;
+  if (!f) return "";
+  // Normalise: library accepts "percentage", not "percent"
+  const normalised = f === "percent" ? "percentage" : f;
+  return ` format="${normalised}"`;
+}
+
+function widgetJSX(w: WidgetConfig, indent = "  "): string {
   const comp = getComponent(w.type);
-  const id = `${w.id}-widget`;
+  const pos = `defaultPosition={{ x: ${w.defaultPosition.x}, y: ${w.defaultPosition.y} }}`;
+  const size = `defaultSize={{ width: ${w.defaultSize.width}, height: ${w.defaultSize.height} }}`;
+  const bools = boolProps(w);
+  // Emit user-supplied strings as JSX expressions via JSON.stringify so titles
+  // containing quotes, angle brackets, or backslashes can't break the output.
+  const title = JSON.stringify(w.title);
 
   if (comp === "KPIWidget") {
     return `${indent}<KPIWidget
-${indent}  id="${id}"
-${indent}  title="${w.title}"
-${indent}  value={0}
-${indent}  format="${w.config.format ?? "number"}"
+${indent}  id="${w.id}"
+${indent}  label={${title}}
+${indent}  value={/* TODO: replace with real data */ 0}${formatProp(w)}
+${indent}  ${pos}
+${indent}  ${size}${bools}
 ${indent}/>`;
   }
+
   if (comp === "RechartsWidget") {
     return `${indent}<RechartsWidget
-${indent}  id="${id}"
-${indent}  title="${w.title}"
+${indent}  id="${w.id}"
+${indent}  title={${title}}
 ${indent}  chartType="${getChartType(w.type)}"
-${indent}  data={[]}
-${indent}  series={[{ key: 'value', name: '${w.title}', color: '#6366f1' }]}
+${indent}  data={/* TODO: replace with real data */ []}
+${indent}  series={[{ dataKey: 'value', name: ${title}, color: '#6366f1' }]}
 ${indent}  xAxisKey="name"
+${indent}  ${pos}
+${indent}  ${size}${bools}
 ${indent}/>`;
   }
-  return `${indent}<NivoWidget
-${indent}  id="${id}"
-${indent}  title="${w.title}"
+
+  return `${indent}<HierarchyWidget
+${indent}  id="${w.id}"
+${indent}  title={${title}}
 ${indent}  chartType="${getChartType(w.type)}"
-${indent}  data={[]}
+${indent}  data={/* TODO: replace with real data */ []}
+${indent}  ${pos}
+${indent}  ${size}${bools}
 ${indent}/>`;
 }
 
@@ -75,28 +94,24 @@ export function generateDashboardCode(
   componentName = "GeneratedDashboard"
 ): string {
   const hasRecharts = widgets.some((w) => RECHARTS_TYPES.has(w.type));
-  const hasNivo = widgets.some((w) => NIVO_TYPES.has(w.type));
+  const hasHierarchy = widgets.some((w) => HIERARCHY_TYPES.has(w.type));
   const hasKpi = widgets.some((w) => w.type === "kpi");
 
-  const widgetImports: string[] = ["Dashboard", "DashboardCard"];
-  if (hasKpi) widgetImports.push("KPIWidget");
-  if (hasRecharts) widgetImports.push("RechartsWidget");
-  if (hasNivo) widgetImports.push("NivoWidget");
+  const imports: string[] = [];
+  imports.push(`import { Dashboard } from 'dashcraft-core'`);
+  if (hasKpi) imports.push(`import { KPIWidget } from 'dashcraft-core/widgets/kpi'`);
+  if (hasRecharts) imports.push(`import { RechartsWidget } from 'dashcraft-core/widgets/recharts'`);
+  if (hasHierarchy) imports.push(`import { HierarchyWidget } from 'dashcraft-core/widgets/hierarchy'`);
+  imports.push(`import 'dashcraft-core/styles.css'`);
 
-  const cards = widgets
-    .map((w) => {
-      const style = `style={{ gridColumn: '${w.colStart} / span ${w.colSpan}', gridRow: '${w.rowStart} / span ${w.rowSpan}' }}`;
-      return `    <DashboardCard id="${w.id}"${boolProps(w)}\n      ${style}\n    >\n${widgetJSX(w)}\n    </DashboardCard>`;
-    })
-    .join("\n\n");
+  const widgetLines = widgets.map((w) => widgetJSX(w)).join("\n\n");
 
-  return `import { ${widgetImports.join(", ")} } from '@dashcraft/core'
-import '@dashcraft/core/styles.css'
+  return `${imports.join("\n")}
 
 export function ${componentName}() {
   return (
-    <Dashboard id="generated" persist="generated-v1">
-${cards}
+    <Dashboard persistenceKey="generated-v1" defaultEditMode>
+${widgetLines}
     </Dashboard>
   )
 }
@@ -117,17 +132,17 @@ export function generateProjectFiles(
         private: true,
         scripts: { dev: "vite", build: "tsc && vite build", preview: "vite preview" },
         dependencies: {
-          "@dashcraft/core": "^0.1.0",
+          "dashcraft-core": "^0.1.0",
           react: "^19.0.0",
           "react-dom": "^19.0.0",
-          recharts: "^2.15.0",
+          recharts: "^3.0.0",
         },
         devDependencies: {
           "@vitejs/plugin-react": "^4.3.4",
           typescript: "^5.7.0",
           vite: "^6.0.0",
-          "@types/react": "^18.3.0",
-          "@types/react-dom": "^18.3.0",
+          "@types/react": "^19.0.0",
+          "@types/react-dom": "^19.0.0",
         },
       },
       null,
@@ -206,13 +221,13 @@ Open http://localhost:5173 to see your dashboard.
 
 ## Customise
 
-Edit \`src/Dashboard.tsx\` — replace the \`data={[]}\` props with your real data.
+Edit \`src/Dashboard.tsx\` — replace the \`/* TODO: replace with real data */\` placeholders with your actual data arrays.
 Add \`className\` or \`style\` props to style widgets to match your design system.
 
 ## Learn more
 
 - [dashcraft docs](https://dashcraft.digitribe.world/docs)
-- [@dashcraft/core on npm](https://npmjs.com/package/@dashcraft/core)
+- [dashcraft-core on npm](https://npmjs.com/package/dashcraft-core)
 `,
   };
 }

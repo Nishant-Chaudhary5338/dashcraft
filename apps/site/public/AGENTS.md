@@ -5,9 +5,9 @@ This file tells AI agents how to work with the dashcraft ecosystem.
 ## Repository Layout
 
 ```
-packages/core/          @dashcraft/core — the React library
+packages/core/          dashcraft-core — the React library
 apps/site/              Product site (Next.js 15)
-tools/codegen/          @dashcraft/mcp-codegen MCP server
+tools/codegen/          dashcraft-mcp-codegen MCP server
 ```
 
 ## Key Files for AI Agents
@@ -20,12 +20,12 @@ tools/codegen/          @dashcraft/mcp-codegen MCP server
 | `packages/core/src/components/DashboardCard.tsx` | Widget wrapper |
 | `packages/core/src/components/widgets/KPIWidget.tsx` | Metric card |
 | `packages/core/src/components/widgets/RechartsWidget.tsx` | recharts wrapper |
-| `packages/core/src/components/widgets/NivoWidget.tsx` | nivo wrapper |
+| `packages/core/src/components/widgets/HierarchyWidget.tsx` | recharts-backed treemap & sunburst, plus a built-in heatmap |
 
 ## How to Generate a Dashboard
 
-1. Install: `npm install @dashcraft/core recharts`
-2. Import styles: `import '@dashcraft/core/styles.css'`
+1. Install: `npm install dashcraft-core recharts`
+2. Import styles: `import 'dashcraft-core/styles.css'`
 3. Wrap with `<Dashboard>`, add `<DashboardCard>` children
 4. Each card takes boolean props: `drag resize settings delete`
 5. Nest a widget component inside each card
@@ -33,8 +33,8 @@ tools/codegen/          @dashcraft/mcp-codegen MCP server
 ## Complete Example
 
 ```tsx
-import { Dashboard, DashboardCard, KPIWidget, RechartsWidget } from '@dashcraft/core'
-import '@dashcraft/core/styles.css'
+import { Dashboard, DashboardCard, KPIWidget, RechartsWidget } from 'dashcraft-core'
+import 'dashcraft-core/styles.css'
 
 const data = [
   { month: 'Jan', revenue: 12400, expenses: 8200 },
@@ -83,7 +83,7 @@ export function SalesDashboard() {
 
 ```bash
 # Install
-npm install -g @dashcraft/mcp-codegen
+npm install -g dashcraft-mcp-codegen
 
 # Register with Claude Desktop — add to claude_desktop_config.json:
 {
@@ -112,7 +112,7 @@ Returns: Array of detected widgets with types, positions, and dashcraft componen
   "componentName": "MyDashboard"
 }
 ```
-Returns: Valid `@dashcraft/core` TSX source.
+Returns: Valid `dashcraft-core` TSX source.
 
 **`generate_project`** — Full Vite project
 ```json

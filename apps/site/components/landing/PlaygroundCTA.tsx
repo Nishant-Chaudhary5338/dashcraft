@@ -12,7 +12,7 @@ export function PlaygroundCTA() {
         </h2>
         <p style={{ fontSize: "1.1rem", color: "var(--text-secondary)", marginBottom: 36, lineHeight: 1.7 }}>
           Upload a dashboard screenshot — or drag widgets yourself — and get production-ready{" "}
-          <span style={{ color: "var(--text-primary)", fontFamily: "var(--font-mono)", fontSize: "0.95em" }}>@dashcraft/core</span>{" "}
+          <span style={{ color: "var(--text-primary)", fontFamily: "var(--font-mono)", fontSize: "0.95em" }}>dashcraft-core</span>{" "}
           code in seconds.
         </p>
         <Link href="/playground" className="btn btn-primary btn-lg">

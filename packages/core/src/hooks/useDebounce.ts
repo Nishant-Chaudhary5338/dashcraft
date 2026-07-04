@@ -22,6 +22,9 @@ import { useState, useEffect, useRef } from "react";
  *   fetchResults(debouncedSearch);
  * }, [debouncedSearch]);
  * ```
+ *
+ * @see {@link useDebouncedCallback} to debounce a function call instead of a value.
+ * @see {@link useThrottle} for a rate-limited (rather than delayed) alternative.
  */
 export function useDebounce<T>(value: T, delay: number = 300): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -56,6 +59,14 @@ export function useDebounce<T>(value: T, delay: number = 300): T {
  * // Call immediately, but execution is delayed
  * debouncedSave(formData);
  * ```
+ *
+ * Note: the returned function is a new reference on every render (it is
+ * not wrapped in `useCallback`), but the `callback` you pass is always
+ * read from a ref at call time, so you never get a stale closure even if
+ * you don't memoize `callback` yourself.
+ *
+ * @see {@link useDebounce} to debounce a value instead of a callback.
+ * @see {@link useThrottledCallback} for a rate-limited (rather than delayed) alternative.
  */
 export function useDebouncedCallback<TArgs extends unknown[]>(
   callback: (...args: TArgs) => void,

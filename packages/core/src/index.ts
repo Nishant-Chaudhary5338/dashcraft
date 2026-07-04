@@ -35,8 +35,13 @@ export {
   usePersistence,
   usePersistedState,
   useStateWithHistory,
+  useMeasure,
+  useMeasureWidth,
+  useTabs,
 } from "./hooks";
 export type {
+  ElementSize,
+  UseTabsReturn,
   UseDraggableOptions,
   UseDraggableReturn,
   ResizeHandle,
@@ -136,10 +141,10 @@ export { PieChartWidget } from "./widgets/recharts/charts/PieChartWidget";
 export { ScatterChartWidget } from "./widgets/recharts/charts/ScatterChartWidget";
 export { RadarChartWidget } from "./widgets/recharts/charts/RadarChartWidget";
 export { RadialBarChartWidget } from "./widgets/recharts/charts/RadialBarChartWidget";
-export { NivoWidget } from "./widgets/nivo/NivoWidget";
-export type { NivoWidgetProps, NivoChartType, HeatmapRowData, TreemapDataNode, SunburstDataNode, NivoColorScheme } from "./widgets/nivo/nivo.types";
-export { HeatMapWidget } from "./widgets/nivo/charts/HeatMapWidget";
-export { TreemapWidget } from "./widgets/nivo/charts/TreemapWidget";
-export { SunburstWidget } from "./widgets/nivo/charts/SunburstWidget";
+export { HierarchyWidget } from "./widgets/hierarchy/HierarchyWidget";
+export type { HierarchyWidgetProps, HierarchyChartType, HeatmapRowData, TreemapDataNode, SunburstDataNode } from "./widgets/hierarchy/hierarchy.types";
+export { HeatMapWidget } from "./widgets/hierarchy/charts/HeatMapWidget";
+export { TreemapWidget } from "./widgets/hierarchy/charts/TreemapWidget";
+export { SunburstWidget } from "./widgets/hierarchy/charts/SunburstWidget";
 export { KPIWidget } from "./widgets/kpi/KPIWidget";
 export type { KPIWidgetProps, KPITrend, KPIFormat } from "./widgets/kpi/KPIWidget";

@@ -22,6 +22,13 @@ import { useState, useEffect, useRef, useCallback } from "react";
  *   updateParallax(throttledScroll);
  * }, [throttledScroll]);
  * ```
+ *
+ * Unlike {@link useDebounce}, which waits for a pause in updates, this
+ * guarantees updates at most every `interval` ms even under continuous
+ * change — the trailing value is always eventually applied.
+ *
+ * @see {@link useThrottledCallback} to throttle a function call instead of a value.
+ * @see {@link useDebounce} for a delay-until-idle (rather than rate-limited) alternative.
  */
 export function useThrottle<T>(value: T, interval: number = 300): T {
   const [throttledValue, setThrottledValue] = useState<T>(value);
@@ -66,6 +73,17 @@ export function useThrottle<T>(value: T, interval: number = 300): T {
  *
  * <div onScroll={throttledScroll}>
  * ```
+ *
+ * Executes on the leading edge when enough time has elapsed since the last
+ * call, otherwise schedules a single trailing-edge call with the latest
+ * arguments — later calls within the same window replace the pending
+ * trailing call rather than queuing additional ones. The returned function
+ * has a stable identity across renders as long as `interval` doesn't
+ * change (memoized with `useCallback`); `callback` is read from a ref at
+ * call time, so it never goes stale.
+ *
+ * @see {@link useThrottle} to throttle a value instead of a callback.
+ * @see {@link useDebouncedCallback} for a delay-until-idle (rather than rate-limited) alternative.
  */
 export function useThrottledCallback<TArgs extends unknown[]>(
   callback: (...args: TArgs) => void,

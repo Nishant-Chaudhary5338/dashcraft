@@ -50,15 +50,22 @@ describe("SettingsThemeSection", () => {
 });
 
 describe("SettingsEndpointSection", () => {
-  it("should render with label and input", () => {
+  it("should render with label and select", () => {
     render(<SettingsEndpointSection endpoint="" onChange={() => {}} onBlur={() => {}} />);
     expect(screen.getByText("Data Endpoint")).toBeInTheDocument();
+    expect(screen.getByRole("combobox")).toBeInTheDocument();
+  });
+
+  it("should show custom input when custom URL option is selected", () => {
+    render(<SettingsEndpointSection endpoint="" onChange={() => {}} onBlur={() => {}} />);
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "__custom__" } });
     expect(screen.getByPlaceholderText("https://api.example.com/data")).toBeInTheDocument();
   });
 
-  it("should call onChange on input change", () => {
+  it("should call onChange on custom input change", () => {
     const onChange = vi.fn();
-    render(<SettingsEndpointSection endpoint="" onChange={onChange} onBlur={() => {}} />);
+    // Use a custom endpoint value (not in endpointOptions) to trigger the custom input
+    render(<SettingsEndpointSection endpoint="https://my-custom.api/data" onChange={onChange} onBlur={() => {}} />);
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "https://api.test.com" } });
     expect(onChange).toHaveBeenCalled();
   });
